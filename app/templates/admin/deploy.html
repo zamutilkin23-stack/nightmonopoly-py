@@ -1,0 +1,199 @@
+<!-- app/templates/admin/deploy.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>🚀 Деплой — NightMonopoly</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e0e0e0;
+            --accent: #bb86fc;
+            --success: #03dac6;
+            --danger: #cf6679;
+            --warning: #ff9800;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #333;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: black;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .deploy-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            text-align: left;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .deploy-btn:hover {
+            background: #2c2c2c;
+            transform: translateY(-2px);
+        }
+
+        .deploy-btn i {
+            font-size: 24px;
+        }
+
+        .deploy-btn.git { color: #e84d31; }
+        .deploy-btn.vps { color: #00bfa5; }
+        .deploy-btn.render { color: #00c2ff; }
+        .deploy-btn.railway { color: #ee553b; }
+
+        .log {
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-size: 14px;
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        .flash.success { background: var(--success); color: black; padding: 10px; border-radius: 6px; }
+        .flash.error { background: var(--danger); color: white; padding: 10px; border-radius: 6px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🚀 Деплой NightMonopoly</h1>
+        <a href="/admin"><button style="background:#333; color:white; border:none; padding:8px 16px; border-radius:6px;">👈 Назад</button></a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="card">
+        <h2>📤 Выберите способ выгрузки</h2>
+        <p>Перед деплоем убедитесь, что изменения сохранены локально.</p>
+
+        <!-- Git -->
+        <form method="POST" action="/admin/deploy/git">
+            <button type="submit" class="deploy-btn git">
+                <i class="fab fa-github"></i>
+                <div>
+                    <strong>GitHub / GitLab</strong>
+                    <small>git add → commit → push</small>
+                </div>
+            </button>
+        </form>
+
+        <!-- VPS -->
+        <form method="POST" action="/admin/deploy/vps">
+            <button type="submit" class="deploy-btn vps">
+                <i class="fas fa-server"></i>
+                <div>
+                    <strong>VPS (SSH + rsync)</strong>
+                    <small>Синхронизация через SSH</small>
+                </div>
+            </button>
+        </form>
+
+        <!-- Render -->
+        <form method="POST" action="/admin/deploy/render">
+            <button type="submit" class="deploy-btn render">
+                <i class="fas fa-cloud"></i>
+                <div>
+                    <strong>Render.com</strong>
+                    <small>Автоматический деплой</small>
+                </div>
+            </button>
+        </form>
+
+        <!-- Railway -->
+        <form method="POST" action="/admin/deploy/railway">
+            <button type="submit" class="deploy-btn railway">
+                <i class="fas fa-train"></i>
+                <div>
+                    <strong>Railway.app</strong>
+                    <small>CI/CD через CLI</small>
+                </div>
+            </button>
+        </form>
+    </div>
+
+    <!-- Лог выполнения -->
+    <div class="card">
+        <h2>📋 Лог операций</h2>
+        <div class="log" id="deploy-log">
+[{{ now() }}] Ожидание команды...
+        </div>
+    </div>
+
+    <script>
+        // Дата для лога
+        function now() {
+            const d = new Date();
+            return d.toLocaleString();
+        }
+
+        // Обновление лога при флеш-сообщениях
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashes = document.querySelectorAll('.flash');
+            const log = document.getElementById('deploy-log');
+            flashes.forEach(flash => {
+                const type = flash.classList.contains('success') ? 'SUCCESS' : 'ERROR';
+                log.textContent += `\n[${now()}] [${type}] ${flash.textContent}`;
+                log.scrollTop = log.scrollHeight;
+            });
+        });
+    </script>
+
+</body>
+</html>
