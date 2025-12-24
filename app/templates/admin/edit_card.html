@@ -1,57 +1,54 @@
-<!-- app/templates/admin/edit_card.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>✏️ Редактировать карточку</title>
-    <meta charset="utf-8">
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        input, textarea, select, button { margin: 5px 0; }
-        .btn { padding: 8px 12px; margin: 5px; background: #007BFF; color: white; border: none; border-radius: 4px; }
-        .btn:hover { background: #0056b3; }
-        label { display: block; margin: 10px 0 5px; }
-        small { color: #777; font-style: italic; }
-    </style>
-</head>
-<body>
-    <h1>✏️ Редактировать карточку</h1>
-    <form method="POST">
-        <label>Текст задания</label>
-        <textarea name="text" rows="3" style="width:100%" required>{{ card.text }}</textarea>
+<!-- templates/admin/add_card.html -->
+{% extends "admin/base.html" %}
 
-        <label>Уровень</label>
-        <select name="level" required>
-            {% for lvl in [1,2,3,4] %}
-            <option value="{{ lvl }}" {% if card.level == lvl %}selected{% endif %}>
-                {{ lvl }} — {% if lvl == 1 %}Лёгкий{% elif lvl == 2 %}Средний{% elif lvl == 3 %}Жёсткий{% else %}Экстремальный{% endif %}
-            </option>
-            {% endfor %}
-        </select>
+{% block title %}Добавить карточку{% endblock %}
 
-        <label>Ориентация</label>
-        <div>
-            {% for orient in ['Гетеро', 'Би', 'Гей', 'Лесби', 'любая'] %}
-            <label>
-                <input type="checkbox" name="orientation" value="{{ orient }}"
-                       {% if orient in card.orientation %}checked{% endif %}>
-                {{ orient }}
-            </label>
-            {% endfor %}
-        </div>
+{% block content %}
+<div class="admin-container">
+  <h2>➕ Добавить карточку</h2>
+  <form method="POST" action="{{ url_for('main.add_card') }}">
+    <div class="form-group">
+      <label>Текст карточки:</label>
+      <textarea name="text" required class="form-control" rows="4"></textarea>
+    </div>
 
-        <label>Состав игроков (gender_combo)</label>
-        <input type="text" name="gender_combo" value="{{ card.gender_combo }}" style="width:100%" required>
-        <small>Пример: МЖ,МЖМ,any</small>
+    <div class="form-group">
+      <label>Уровень (1-3):</label>
+      <input type="number" name="level" min="1" max="3" required class="form-control">
+    </div>
 
-        <label>Цель</label>
-        <select name="target" required>
-            {% for t, label in [('random', 'Случайный'), ('self', 'Себя'), ('neighbor', 'Сосед'), ('opposite', 'Напротив'), ('all', 'Все')] %}
-            <option value="{{ t }}" {% if card.target == t %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
+    <div class="form-group">
+      <label>Ориентация:</label>
+      <select name="orientation" required class="form-control">
+        <option value="Гетеро">Гетеро</option>
+        <option value="Лесби">Лесби</option>
+        <option value="Би">Би</option>
+        <option value="Гей">Гей</option>
+        <option value="Любая">Любая</option>
+      </select>
+    </div>
 
-        <button type="submit" class="btn">✅ Сохранить</button>
-        <a href="/admin" class="btn" style="background:#888;">Отмена</a>
-    </form>
-</body>
-</html>
+    <div class="form-group">
+      <label>Половая комбинация:</label>
+      <select name="gender_combo" required class="form-control">
+        <option value="М+Ж">М+Ж</option>
+        <option value="М+М">М+М</option>
+        <option value="Ж+Ж">Ж+Ж</option>
+        <option value="Любая">Любая</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Цель:</label>
+      <select name="target" required class="form-control">
+        <option value="Любой">Любой</option>
+        <option value="Мужчина">Мужчина</option>
+        <option value="Женщина">Женщина</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Добавить карточку</button>
+    <a href="{{ url_for('main.admin_index') }}" class="btn btn-secondary">Назад</a>
+  </form>
+</div>
+{% endblock %}
