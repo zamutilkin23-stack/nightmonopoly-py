@@ -1,0 +1,57 @@
+<!-- app/templates/admin/edit_card.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>✏️ Редактировать карточку</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        input, textarea, select, button { margin: 5px 0; }
+        .btn { padding: 8px 12px; margin: 5px; background: #007BFF; color: white; border: none; border-radius: 4px; }
+        .btn:hover { background: #0056b3; }
+        label { display: block; margin: 10px 0 5px; }
+        small { color: #777; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>✏️ Редактировать карточку</h1>
+    <form method="POST">
+        <label>Текст задания</label>
+        <textarea name="text" rows="3" style="width:100%" required>{{ card.text }}</textarea>
+
+        <label>Уровень</label>
+        <select name="level" required>
+            {% for lvl in [1,2,3,4] %}
+            <option value="{{ lvl }}" {% if card.level == lvl %}selected{% endif %}>
+                {{ lvl }} — {% if lvl == 1 %}Лёгкий{% elif lvl == 2 %}Средний{% elif lvl == 3 %}Жёсткий{% else %}Экстремальный{% endif %}
+            </option>
+            {% endfor %}
+        </select>
+
+        <label>Ориентация</label>
+        <div>
+            {% for orient in ['Гетеро', 'Би', 'Гей', 'Лесби', 'любая'] %}
+            <label>
+                <input type="checkbox" name="orientation" value="{{ orient }}"
+                       {% if orient in card.orientation %}checked{% endif %}>
+                {{ orient }}
+            </label>
+            {% endfor %}
+        </div>
+
+        <label>Состав игроков (gender_combo)</label>
+        <input type="text" name="gender_combo" value="{{ card.gender_combo }}" style="width:100%" required>
+        <small>Пример: МЖ,МЖМ,any</small>
+
+        <label>Цель</label>
+        <select name="target" required>
+            {% for t, label in [('random', 'Случайный'), ('self', 'Себя'), ('neighbor', 'Сосед'), ('opposite', 'Напротив'), ('all', 'Все')] %}
+            <option value="{{ t }}" {% if card.target == t %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn">✅ Сохранить</button>
+        <a href="/admin" class="btn" style="background:#888;">Отмена</a>
+    </form>
+</body>
+</html>

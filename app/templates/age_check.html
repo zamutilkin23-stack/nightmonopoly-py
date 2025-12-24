@@ -1,0 +1,54 @@
+<!-- app/templates/age_check.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🔞 Проверка возраста</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #000;
+            color: #f00;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+        h1 { font-size: 2.5em; text-shadow: 0 0 10px #f00; }
+        input {
+            padding: 10px;
+            font-size: 18px;
+            width: 100px;
+            text-align: center;
+            margin: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background: #f00;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            input, button { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔞 18+</h1>
+    <p>Этот контент предназначен только для взрослых</p>
+    <form method="POST">
+        <input type="number" name="age" placeholder="Возраст" required>
+        <br><br>
+        <button type="submit">Подтвердить</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+            <p style="color:yellow; margin-top:20px;">{{ msg }}</p>
+        {% endfor %}
+    {% endwith %}
+</body>
+</html>
