@@ -1,210 +1,197 @@
 # app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from functools import wraps
-from .models import db, Card, PenaltyCard
-import random
-import string
-import qrcode
-from io import BytesIO
-import base64
+from .models import Card, PenaltyCard
+from .extensions import db
 
-# === ✅ СНАЧАЛА создаём Blueprint ===
 main = Blueprint('main', __name__)
 
-
-# === 🔐 Админ: вход/выход ===
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('admin_logged_in'):
-            return redirect('/admin/login')
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-@main.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if request.method == 'POST':
-        if request.form['username'] == 'Vladimirovich' and request.form['password'] == 'Timur':
-            session['admin_logged_in'] = True
-            return redirect('/admin')
-        flash('❌ Неверный логин или пароль')
-    return '''
-    <form method="POST" style="text-align:center;margin:50px;">
-        <h2>🔐 Вход в админку</h2>
-        <input name="username" placeholder="Логин" required><br><br>
-        <input type="password" name="password" placeholder="Пароль" required><br><br>
-        <button type="submit">Войти</button>
-    </form>
-    '''
-
-
-@main.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    flash('✅ Выход выполнен')
-    return redirect('/admin/login')
-
-
-@main.route('/admin')
-@admin_required
-def admin():
-    cards = Card.query.all()
-    penalties = PenaltyCard.query.all()
-    return render_template('admin/index.html', cards=cards, penalties=penalties)
-
-
-# === 🎮 ОСНОВНЫЕ МАРШРУТЫ ===
-
+# Главная
 @main.route('/')
 def index():
     return render_template('index.html')
 
-
+# Проверка возраста
 @main.route('/age-check', methods=['GET', 'POST'])
 def age_check():
     if request.method == 'POST':
-        age = request.form.get('age')
-        if age and int(age) >= 18:
+        if request.form.get('age') == 'yes':
             session['age_verified'] = True
-            return redirect('/game-setup')
-        flash('❌ Вам должно быть 18+')
+            return redirect(url_for('main.game_setup'))
+        else:
+            return redirect(url_for('main.index'))
     return render_template('age_check.html')
 
-
-@main.route('/game-setup')
+# Настройка игроков
+@main.route('/game-setup', methods=['GET', 'POST'])
 def game_setup():
     if not session.get('age_verified'):
-        return redirect('/age-check')
+        return redirect(url_for('main.age_check'))
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        gender = request.form.get('gender')
+        orientation = request.form.get('orientation')
+        players = session.get('players', [])
+        players.append({'name': name, 'gender': gender, 'orientation': orientation})
+        session['players'] = players
+
     players = session.get('players', [])
     return render_template('game_setup.html', players=players)
 
-
-@main.route('/add-player', methods=['POST'])
-def add_player():
-    name = request.form['name'].strip()
-    if not name:
-        flash('❌ Имя не может быть пустым')
-        return redirect('/game-setup')
-    players = session.get('players', [])
-    if len(players) >= 4:
-        flash('❌ Максимум 4 игрока')
-    else:
-        players.append({
-            'name': name,
-            'gender': request.form['gender'],
-            'orientation': request.form['orientation']
-        })
-        session['players'] = players
-    return redirect('/game-setup')
-
-
-@main.route('/remove-player/<int:index>')
+# Удаление игрока
+@main.route('/remove-player/<int:index>', methods=['POST'])
 def remove_player(index):
     players = session.get('players', [])
     if 0 <= index < len(players):
         players.pop(index)
         session['players'] = players
-    return redirect('/game-setup')
+    return redirect(url_for('main.game_setup'))
 
-
-# === 🚀 START GAME — ключевой маршрут ===
+# Начало игры
 @main.route('/start-game')
 def start_game():
-    players = session.get('players', [])
-    if len(players) < 2:
-        flash('❌ Минимум 2 игрока')
-        return redirect('/game-setup')
+    if not session.get('players'):
+        flash('Добавьте хотя бы одного игрока!')
+        return redirect(url_for('main.game_setup'))
 
-    session.update({
-        'game_code': ''.join(random.choices(string.ascii_uppercase + string.digits, k=6)),
-        'current_player_index': 0,
-        'current_level': 1,
-        'used_cards': [],
-        'game_started': True
-    })
-    return redirect('/game')  # ✅ Переход в игру
+    import random
+    session['game_code'] = str(random.randint(100000, 999999))
+    session['current_player_index'] = 0
+    return redirect(url_for('main.game'))
 
-
-# === 🎲 ИГРОВОЙ ЭКРАН ===
+# Игровой экран
 @main.route('/game')
 def game():
-    if not session.get('game_started') or len(session.get('players', [])) < 2:
-        return redirect('/game-setup')
+    players = session.get('players', [])
+    if not players:
+        return redirect(url_for('main.game_setup'))
 
-    players = session['players']
-    current_idx = session['current_player_index']
-    current_player = players[current_idx]
-    current_level = session['current_level']
-    player_combo = ''.join([p['gender'] for p in players])
-
-    available_cards = Card.query.filter_by(level=current_level).all()
-    available_cards = [
-        c for c in available_cards
-        if "any" in c.gender_combo or player_combo in [combo.strip() for combo in c.gender_combo.split(',')]
-    ]
-    available_cards = [c for c in available_cards if c.id not in session['used_cards']]
-
-    if not available_cards:
-        if current_level < 4:
-            session['current_level'] += 1
-            session['used_cards'] = []
-            return redirect('/game')
-        else:
-            flash('🎉 Все карточки использованы!')
-            return redirect('/game-setup')
-
-    card = random.choice(available_cards)
-    session['used_cards'].append(card.id)
-
+    current_idx = session.get('current_player_index', 0)
+    current = players[current_idx]
     next_idx = (current_idx + 1) % len(players)
     session['current_player_index'] = next_idx
 
-    return render_template(
-        'game.html',
-        card=card,
-        current_player=current_player,
-        next_player=players[next_idx],
-        current_level=current_level
-    )
+    card = Card.query.order_by(db.func.random()).first()
+    if not card:
+        card_text = "Нет доступных карточек"
+    else:
+        card_text = card.text
 
+    return render_template('game.html', player=current, card=card_text)
 
-# === 🔄 Сброс игры ===
-@main.route('/reset-game')
-def reset_game():
-    session.clear()
-    flash('🔄 Игра сброшена')
-    return redirect('/game-setup')
-
-
-# === ⚠️ ЭКРАН ШТРАФА ===
+# Экран штрафа
 @main.route('/penalty')
-def show_penalty():
-    if not session.get('game_started'):
-        return redirect('/game-setup')
-    try:
-        penalty = random.choice(PenaltyCard.query.all())
-        duration = penalty.duration
-        return render_template('penalty.html', penalty=penalty, duration=duration)
-    except:
-        flash('❌ Ошибка загрузки штрафа')
-        return redirect('/game')
+def penalty():
+    card = PenaltyCard.query.order_by(db.func.random()).first()
+    duration = card.duration if card else 60
+    text = card.text if card else "Выполните штраф: станцуйте!"
+    return render_template('penalty.html', text=text, duration=duration)
 
+# === АДМИНКА ===
 
-# === 🖼️ ГЕНЕРАТОР QR-КОДА — В КОНЦЕ! ===
-@main.app_context_processor
-def inject_qr():
-    def generate_qr_base64(data):
+# Логин (простой пароль)
+@main.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        if request.form['login'] == 'Vladimirovich' and request.form['password'] == 'Timur':
+            session['admin'] = True
+            return redirect(url_for('main.admin_index'))
+        else:
+            flash('Неверный логин или пароль')
+    return render_template('admin/login.html')
+
+# Главная админки
+@main.route('/admin')
+def admin_index():
+    if not session.get('admin'):
+        return redirect(url_for('main.admin_login'))
+    cards = Card.query.all()
+    penalties = PenaltyCard.query.all()
+    return render_template('admin/index.html', cards=cards, penalties=penalties)
+
+# Добавить карточку
+@main.route('/admin/add-card', methods=['GET', 'POST'])
+def add_card():
+    if not session.get('admin'):
+        return redirect(url_for('main.admin_login'))
+
+    if request.method == 'POST':
         try:
-            qr = qrcode.QRCode(version=1, box_size=4, border=2)
-            qr.add_data(data)
-            qr.make(fit=True)
-            img = qr.make_image(fill_color="black", back_color="white")
-            buffer = BytesIO()
-            img.save(buffer, format="PNG")
-            img_str = base64.b64encode(buffer.getvalue()).decode()
-            return f"data:image/png;base64,{img_str}"
+            text = request.form['text']
+            level = int(request.form['level'])
+            orientation = request.form['orientation']
+            gender_combo = request.form['gender_combo']
+            target = request.form['target']
+
+            card = Card(
+                text=text,
+                level=level,
+                orientation=orientation,
+                gender_combo=gender_combo,
+                target=target
+            )
+            db.session.add(card)
+            db.session.commit()
+            flash('Карточка добавлена!')
+            return redirect(url_for('main.admin_index'))
         except Exception as e:
-            print("QR Error:", e)
-            return ""
-    return dict(generate_qr_base64=generate_qr_base64)
+            flash(f'Ошибка: {e}')
+            return redirect(url_for('main.add_card'))
+
+    return render_template('admin/add_card.html')
+
+# Добавить штраф
+@main.route('/admin/add-penalty', methods=['GET', 'POST'])
+def add_penalty():
+    if not session.get('admin'):
+        return redirect(url_for('main.admin_login'))
+
+    if request.method == 'POST':
+        try:
+            text = request.form['text']
+            duration = int(request.form['duration'])
+
+            penalty = PenaltyCard(text=text, duration=duration)
+            db.session.add(penalty)
+            db.session.commit()
+            flash('Штраф добавлен!')
+            return redirect(url_for('main.admin_index'))
+        except Exception as e:
+            flash(f'Ошибка: {e}')
+            return redirect(url_for('main.add_penalty'))
+
+    return render_template('admin/add_penalty.html')
+
+# Редактировать карточку
+@main.route('/admin/edit-card/<int:id>', methods=['GET', 'POST'])
+def edit_card(id):
+    if not session.get('admin'):
+        return redirect(url_for('main.admin_login'))
+
+    card = Card.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            card.text = request.form['text']
+            card.level = int(request.form['level'])
+            card.orientation = request.form['orientation']
+            card.gender_combo = request.form['gender_combo']
+            card.target = request.form['target']
+            db.session.commit()
+            flash('Карточка обновлена!')
+            return redirect(url_for('main.admin_index'))
+        except Exception as e:
+            flash(f'Ошибка: {e}')
+
+    return render_template('admin/edit_card.html', card=card)
+
+# Удалить карточку
+@main.route('/admin/delete-card/<int:id>', methods=['POST'])
+def delete_card(id):
+    if not session.get('admin'):
+        return redirect(url_for('main.admin_login'))
+
+    card = Card.query.get_or_404(id)
+    db.session.delete(card)
+    db.session.commit()
+    flash('Карточка удалена!')
+    return redirect(url_for('main.admin_index'))
