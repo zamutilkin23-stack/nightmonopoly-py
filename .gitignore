@@ -1,0 +1,30 @@
+# Виртуальное окружение
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+*.egg-info/
+.installed.cfg
+
+# Логи
+*.log
+
+# Локальные настройки
+.env
+.env.local
+
+# База данных
+night.db
+instance/
+
+# Системные
+.DS_Store
+Thumbs.db
