@@ -1,0 +1,10 @@
+<<<<<<< HEAD
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+python-dotenv==1.0.1
+=======
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+python-dotenv==1.0.1
+>>>>>>> 05fc079 (🚀 Первый коммит: NightMonopoly v1.0 готов к деплою)
+qrcode[pil]==7.4.2
