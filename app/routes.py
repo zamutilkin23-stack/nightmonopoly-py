@@ -47,15 +47,22 @@ def remove_player(index):
         session['players'] = players
     return redirect(url_for('main.game_setup'))
 
-# Начало игры
-@main.route('/start-game')
+# Начало игры (поддержка ?id=123456)
+@main.route('/start-game', methods=['GET'])
 def start_game():
+    # Если есть game_id в URL — сохраняем
+    game_id = request.args.get('game_id')
+    if game_id:
+        session['game_code'] = game_id[:6]
+
     if not session.get('players'):
         flash('Добавьте хотя бы одного игрока!')
         return redirect(url_for('main.game_setup'))
 
-    import random
-    session['game_code'] = str(random.randint(100000, 999999))
+    if not session.get('game_code'):
+        import random
+        session['game_code'] = str(random.randint(100000, 999996))
+
     session['current_player_index'] = 0
     return redirect(url_for('main.game'))
 
@@ -67,15 +74,15 @@ def game():
         return redirect(url_for('main.game_setup'))
 
     current_idx = session.get('current_player_index', 0)
+    if current_idx >= len(players):
+        current_idx = 0
+
     current = players[current_idx]
     next_idx = (current_idx + 1) % len(players)
     session['current_player_index'] = next_idx
 
     card = Card.query.order_by(db.func.random()).first()
-    if not card:
-        card_text = "Нет доступных карточек"
-    else:
-        card_text = card.text
+    card_text = card.text if card else "Нет доступных карточек"
 
     return render_template('game.html', player=current, card=card_text)
 
@@ -89,7 +96,7 @@ def penalty():
 
 # === АДМИНКА ===
 
-# Логин (простой пароль)
+# Логин
 @main.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -195,3 +202,23 @@ def delete_card(id):
     db.session.commit()
     flash('Карточка удалена!')
     return redirect(url_for('main.admin_index'))
+
+# Генератор QR-кода
+@main.route('/admin/qr-generator', methods=['GET', 'POST'])
+def qr_generator():
+    if not session.get('admin'):
+        return redirect(url_for('main.admin_login'))
+
+    qr_code = None
+    game_id = None
+
+    if request.method == 'POST':
+        game_id = request.form.get('game_id', '').strip()
+        if game_id and game_id.isdigit() and 100000 <= int(game_id) <= 999999:
+            base_url = "https://nightmonopoly-py.onrender.com/start-game?game_id="
+            full_url = base_url + game_id
+            qr_code = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={full_url}"
+        else:
+            flash("Введите корректный 6-значный номер игры!")
+
+    return render_template('admin/qr_generator.html', qr_code=qr_code, game_id=game_id)
