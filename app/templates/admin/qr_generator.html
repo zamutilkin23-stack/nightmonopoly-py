@@ -1,0 +1,27 @@
+<!-- templates/admin/qr_generator.html -->
+{% extends "admin/base.html" %}
+
+{% block title %}Генератор QR-кода{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+  <h2>📱 Генератор QR-кода</h2>
+  <p>Введите номер игры — и получите QR-код для игроков.</p>
+
+  <form method="POST" action="{{ url_for('main.qr_generator') }}">
+    <div class="form-group">
+      <label>Номер игры (например: 123456):</label>
+      <input type="text" name="game_id" placeholder="123456" required class="form-control" maxlength="6">
+    </div>
+    <button type="submit" class="btn btn-primary">Сгенерировать QR</button>
+  </form>
+
+  {% if qr_code %}
+  <div class="mt-4">
+    <h4>Ваш QR-код:</h4>
+    <img src="{{ qr_code }}" alt="QR Code" class="img-fluid border rounded">
+    <p class="mt-2"><strong>Ссылка:</strong> <a href="{{ 'https://nightmonopoly-py.onrender.com/game?id=' + game_id }}" target="_blank">Открыть в новой вкладке</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
