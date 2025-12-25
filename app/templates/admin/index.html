@@ -1,87 +1,301 @@
-<!-- templates/admin/index.html -->
-{% extends "admin/base.html" %}
+<!-- app/templates/admin/index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>🔧 Админка NightMonopoly</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --accent: #bb86fc;
+            --success: #03dac6;
+            --danger: #cf6679;
+            --warning: #ff9800;
+        }
 
-{% block title %}Админка — NightMonopoly{% endblock %}
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-{% block content %}
-<div class="admin-container">
-  <h2>🛠️ Админка</h2>
-  <div class="alert alert-info">
-    Добро пожаловать, {{ 'Vladimirovich' }}.
-  </div>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
 
-  <div class="row">
-    <!-- Меню -->
-    <div class="col-md-3 mb-4">
-      <div class="list-group">
-        <a href="{{ url_for('main.admin_index') }}" class="list-group-item active">🏠 Главная</a>
-        <a href="{{ url_for('main.add_card') }}" class="list-group-item">➕ Добавить карточку</a>
-        <a href="{{ url_for('main.add_penalty') }}" class="list-group-item">⏱️ Добавить штраф</a>
-        <a href="{{ url_for('main.qr_generator') }}" class="list-group-item">📱 Генератор QR-кода</a>
-      </div>
+        .header h1 {
+            color: var(--accent);
+            margin: 0;
+        }
+
+        .logout {
+            background: #333;
+            color: var(--text);
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #333;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: black;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-success { background: var(--success); color: black; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: black; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            background: #2c2c2c;
+            color: var(--accent);
+        }
+
+        tr:hover {
+            background: #2a2a2a;
+        }
+
+        .deploy-section {
+            margin-top: 30px;
+        }
+
+        .deploy-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 15px;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            text-align: left;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .deploy-btn:hover {
+            background: #2c2c2c;
+            transform: translateY(-2px);
+        }
+
+        .deploy-btn i {
+            font-size: 24px;
+        }
+
+        .deploy-btn.git { color: #e84d31; }
+        .deploy-btn.vps { color: #00bfa5; }
+        .deploy-btn.render { color: #00c2ff; }
+        .deploy-btn.railway { color: #ee553b; }
+
+        .flash {
+            background: var(--success);
+            color: black;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs { flex-wrap: wrap; }
+            .tab { font-size: 14px; padding: 8px 12px; }
+            th, td { font-size: 14px; padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🔧 Админка NightMonopoly</h1>
+        <a href="/admin/logout"><button class="logout">🚪 Выход</button></a>
     </div>
 
-    <!-- Контент -->
-    <div class="col-md-9">
-      <!-- Карточки -->
-      <h4>🃏 Карточки ({{ cards|length }})</h4>
-      <table class="table table-bordered table-sm">
-        <thead>
-          <tr>
-            <th>Текст</th>
-            <th>Ур.</th>
-            <th>Ориент.</th>
-            <th>Комбинация</th>
-            <th>Цель</th>
-            <th>Действия</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for card in cards %}
-          <tr>
-            <td>{{ card.text }}</td>
-            <td>{{ card.level }}</td>
-            <td>{{ card.orientation }}</td>
-            <td>{{ card.gender_combo }}</td>
-            <td>{{ card.target }}</td>
-            <td>
-              <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn btn-warning btn-sm">✏️</a>
-              <form action="{{ url_for('main.delete_card', id=card.id) }}" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Удалить?')">🗑️</button>
-              </form>
-            </td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="6" class="text-center text-muted">Карточек нет</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    {% with messages = get_flashed_messages() %}
+        {% for msg in messages %}
+            <div class="flash">{{ msg }}</div>
+        {% endfor %}
+    {% endwith %}
 
-      <!-- Штрафы -->
-      <h4 class="mt-4">⏱️ Штрафы ({{ penalties|length }})</h4>
-      <table class="table table-bordered table-sm">
-        <thead>
-          <tr>
-            <th>Текст</th>
-            <th>Длительность (с)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in penalties %}
-          <tr>
-            <td>{{ p.text }}</td>
-            <td>{{ p.duration }}</td>
-          </tr>
-          {% else %}
-          <tr>
-            <td colspan="2" class="text-center text-muted">Штрафов нет</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="tabs">
+        <div class="tab active">📋 Контент</div>
+        <div class="tab">🚀 Деплой</div>
     </div>
-  </div>
-</div>
-{% endblock %}
+
+    <!-- === КАРТОЧКИ И ШТРАФЫ === -->
+    <div class="card">
+        <div class="card-header">
+            <h2>🃏 Карточки с заданиями</h2>
+            <a href="/admin/card/add"><button class="btn btn-success">➕ Добавить</button></a>
+        </div>
+
+        {% if cards %}
+        <table>
+            <tr>
+                <th>Текст</th>
+                <th>Ур.</th>
+                <th>Ориентация</th>
+                <th>Состав</th>
+                <th>Цель</th>
+                <th>Действия</th>
+            </tr>
+            {% for card in cards %}
+            <tr>
+                <td>{{ card.text }}</td>
+                <td>{{ card.level }}</td>
+                <td>{{ card.orientation }}</td>
+                <td>{{ card.gender_combo }}</td>
+                <td>{{ card.target }}</td>
+                <td>
+                    <a href="/admin/card/edit/{{ card.id }}"><button class="btn btn-warning">✏️</button></a>
+                    <form method="POST" action="/admin/card/delete/{{ card.id }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>❌ Нет карточек. Добавьте первую.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>⚖️ Штрафы</h2>
+            <a href="/admin/penalty/add"><button class="btn btn-success">➕ Добавить</button></a>
+        </div>
+
+        {% if penalties %}
+        <table>
+            <tr>
+                <th>Текст штрафа</th>
+                <th>Длительность</th>
+                <th>Действия</th>
+            </tr>
+            {% for p in penalties %}
+            <tr>
+                <td>{{ p.text }}</td>
+                <td>{{ p.duration }} сек</td>
+                <td>
+                    <form method="POST" action="/admin/penalty/delete/{{ p.id }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>❌ Нет штрафов.</p>
+        {% endif %}
+    </div>
+
+    <!-- === ДЕПЛОЙ НА СЕРВЕРЫ === -->
+    <div class="card deploy-section">
+        <h2>🚀 Выгрузка на сервер</h2>
+        <p>Нажмите, чтобы начать синхронизацию с удалённым сервером</p>
+
+        <button class="deploy-btn git" onclick="alert('📤 Push в GitHub...')">
+            <i class="fab fa-github"></i>
+            <div>
+                <strong>GitHub / GitLab</strong>
+                <small>Локальная сессия → Облачный репозиторий</small>
+            </div>
+        </button>
+
+        <button class="deploy-btn vps" onclick="alert('🔗 Подключение к VPS...')">
+            <i class="fas fa-server"></i>
+            <div>
+                <strong>VPS (SSH)</strong>
+                <small>Ручная синхронизация с сервером</small>
+            </div>
+        </button>
+
+        <button class="deploy-btn render" onclick="alert('☁️ Деплой на Render...')">
+            <i class="fas fa-cloud"></i>
+            <div>
+                <strong>Render.com</strong>
+                <small>Автоматический деплой с GitHub</small>
+            </div>
+        </button>
+
+        <button class="deploy-btn railway" onclick="alert('🚂 Деплой на Railway...')">
+            <i class="fas fa-train"></i>
+            <div>
+                <strong>Railway.app</strong>
+                <small>Быстрый старт с CI/CD</small>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        // Активация вкладок (заглушка)
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                alert('Вкладка в разработке');
+            });
+        });
+    </script>
+
+</body>
+</html>
