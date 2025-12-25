@@ -2,4 +2,4 @@ Flask
 Flask-SQLAlchemy
 qrcode[pil]
 python-dotenv
-psycopg2-binarypsycopg2-binary
+psycopg2-binary
