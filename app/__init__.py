@@ -1,7 +1,13 @@
+# app/__init__.py
+from flask import Flask
+from .extensions import db
+import os
+
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
-    
+    app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-change-in-prod')
+
+    # База данных
     database_url = os.getenv('DATABASE_URL', 'sqlite:///night.db')
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
@@ -9,6 +15,8 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
+
+    # Регистрация blueprint
     from .routes import main
     app.register_blueprint(main)
 
