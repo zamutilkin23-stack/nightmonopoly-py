@@ -17,36 +17,48 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #121212, #000);
     }
     .logo {
-      font-size: 2.8em;
+      font-size: 2.6em;
       color: #e74c3c;
       margin-bottom: 10px;
-      text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+      font-weight: bold;
+      text-shadow: 0 0 15px rgba(231, 76, 60, 0.4);
+    }
+    .subtitle {
+      font-size: 1em;
+      color: #aaa;
+      margin-bottom: 30px;
+      max-width: 380px;
+      line-height: 1.5;
     }
     .warning {
-      font-size: 1.1em;
-      color: #ddd;
+      font-size: 0.95em;
+      color: #999;
       margin: 15px auto;
       max-width: 400px;
       line-height: 1.5;
     }
     .btn {
       display: inline-block;
-      padding: 14px 32px;
+      padding: 12px 28px;
       background: #e74c3c;
       color: white;
       text-decoration: none;
-      border-radius: 30px;
-      font-size: 1.2em;
-      margin: 15px;
+      border-radius: 25px;
+      font-size: 1.1em;
+      margin: 15px 0;
       border: none;
       cursor: pointer;
-      transition: 0.3s;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
     }
     .btn:hover {
       background: #c0392b;
-      transform: scale(1.05);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
     }
     .admin-link {
       position: fixed;
@@ -65,10 +77,10 @@
   </style>
 </head>
 <body>
-  <h1 class="logo">🔥 Ночные забавы</h1>
+  <h1 class="logo">NightFanta</h1>
+  <p class="subtitle">Игра для настоящих</p>
   <p class="warning">
-    Это приложение содержит контент для взрослых.<br>
-    Вход разрешён только лицам от 18 лет.
+    Контент для взрослых. Только для лиц от 18 лет.
   </p>
   <a href="/players" class="btn">Начать игру</a>
 

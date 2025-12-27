@@ -1,34 +1,119 @@
 <!-- templates/setup.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>Настройка</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Настройка игроков</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #000; color: #fff; }
-    .btn { padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; }
-    .form { max-width: 500px; margin: 30px auto; }
-    input, select { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 6px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #000;
+      color: #fff;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 500px;
+      margin: 30px auto;
+      background: #111;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+    h2 {
+      color: #e74c3c;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.5em;
+    }
+    .player {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border-left: 4px solid #e74c3c;
+    }
+    h3 {
+      color: #ddd;
+      margin-bottom: 12px;
+      font-size: 1.1em;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      font-size: 1em;
+    }
+    input:focus, select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #e74c3c;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #e74c3c;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 25px;
+      font-size: 1.1em;
+      margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
+    .admin-link {
+      position: fixed;
+      left: 15px;
+      bottom: 15px;
+      color: #333;
+      font-size: 24px;
+      opacity: 0.1;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .admin-link:hover, .admin-link:active {
+      opacity: 1;
+      color: #e74c3c;
+    }
   </style>
 </head>
 <body>
-  <h2>📝 Введите имена и настройки</h2>
-  <form method="POST" action="/start">
-    {% for i in range(1, count + 1) %}
-      <h3>Игрок {{ i }}</h3>
-      <input type="text" name="name{{ i }}" placeholder="Имя" required>
-      <select name="gender{{ i }}" required>
-        <option value="Парень">Парень</option>
-        <option value="Девушка">Девушка</option>
-      </select>
-      <select name="orientation{{ i }}" required>
-        <option value="Гетеро">Гетеро</option>
-        <option value="Би">Би</option>
-        <option value="Лесби">Лесби</option>
-        <option value="Другое">Другое</option>
-      </select>
-    {% endfor %}
-    <button type="submit" class="btn">Старт игры</button>
-  </form>
+  <div class="container">
+    <h2>📝 Введите данные игроков</h2>
+    <form method="POST" action="/start">
+      {% for i in range(1, count + 1) %}
+        <div class="player">
+          <h3>Игрок {{ i }}</h3>
+          <input type="text" name="name{{ i }}" placeholder="Имя" required>
+          <select name="gender{{ i }}" required>
+            <option value="">Пол</option>
+            <option value="Парень">Парень</option>
+            <option value="Девушка">Девушка</option>
+          </select>
+          <select name="orientation{{ i }}" required>
+            <option value="">Ориентация</option>
+            <option value="Гетеро">Гетеро</option>
+            <option value="Би">Би</option>
+            <option value="Лесби">Лесби</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn">Старт игры</button>
+    </form>
+  </div>
+
+  <a href="/admin-secret" class="admin-link">...</a>
 </body>
 </html>

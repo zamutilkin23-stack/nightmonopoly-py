@@ -1,25 +1,103 @@
 <!-- templates/players.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Игроки</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; padding: 20px; background: #000; color: #fff; }
-    .btn { padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; }
-    .form { max-width: 500px; margin: 30px auto; }
-    input, select { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 6px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 30px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    h2 {
+      color: #e74c3c;
+      margin-bottom: 25px;
+      font-size: 1.6em;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: #e74c3c;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-size: 1.1em;
+      margin: 15px 0;
+      box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
+    }
+    select {
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 15px;
+      margin: 15px 0;
+      border: none;
+      border-radius: 25px;
+      background: #333;
+      color: #fff;
+      font-size: 1em;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    select:focus {
+      outline: none;
+      background: #444;
+      box-shadow: 0 0 0 2px #e74c3c;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .info {
+      color: #aaa;
+      font-size: 0.9em;
+      margin: 10px 0;
+    }
+    .admin-link {
+      position: fixed;
+      left: 15px;
+      bottom: 15px;
+      color: #333;
+      font-size: 24px;
+      opacity: 0.1;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .admin-link:hover, .admin-link:active {
+      opacity: 1;
+      color: #e74c3c;
+    }
   </style>
 </head>
 <body>
-  <h2>👥 Укажите игроков</h2>
+  <h2>👥 Кто играет?</h2>
+  <p class="info">Выберите количество игроков</p>
+
   <form action="/setup" method="GET">
-    <select name="count">
-      <option value="2">2 игрока</option>
-      <option value="3">3 игрока</option>
-      <option value="4">4 игрока</option>
-    </select>
+    <div class="form-group">
+      <select name="count" required>
+        <option value="" disabled selected>Количество игроков</option>
+        <option value="2">2 игрока</option>
+        <option value="3">3 игрока</option>
+        <option value="4">4 игрока</option>
+      </select>
+    </div>
     <button type="submit" class="btn">Далее</button>
   </form>
+
+  <a href="/admin-secret" class="admin-link">...</a>
 </body>
 </html>
