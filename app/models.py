@@ -8,7 +8,6 @@ class Card(db.Model):
     orientation = db.Column(db.String(100), nullable=False)
     gender_combo = db.Column(db.String(20), nullable=False)
     target = db.Column(db.String(20), nullable=False)
-    image_url = db.Column(db.String(300), nullable=True)
 
 class PenaltyCard(db.Model):
     id = db.Column(db.Integer, primary_key=True)

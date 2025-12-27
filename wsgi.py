@@ -4,22 +4,22 @@ from app import create_app
 
 app = create_app()
 
-# 🔥 Создаём таблицы при запуске (если их нет)
+# Создаём таблицы при запуске
 with app.app_context():
     from app.extensions import db
-    from app.models import Card
+    from app.models import Card, PenaltyCard
 
-    # Убедимся, что папка data существует
+    # Убедимся, что папка data есть
     data_dir = '/opt/render/project/src/data'
     os.makedirs(data_dir, exist_ok=True)
 
     db.create_all()
+    print("✅ Таблицы созданы в /data/nightmonopoly.db")
 
-    # Добавляем тестовую карточку
+    # Тестовая карточка (только если пусто)
     if Card.query.first() is None:
-        from app.models import Card
         test_card = Card(
-            text="🚀 База создана автоматически! NightMonopoly живёт!",
+            text="🚀 База инициализирована! Добро пожаловать в NightMonopoly!",
             level=1,
             orientation="Любая",
             gender_combo="Любой",
