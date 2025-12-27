@@ -8,7 +8,9 @@ def create_app():
     app.config['SECRET_KEY'] = 'dev-night-2024'
 
     # Путь к базе на постоянном диске
-    db_path = os.path.join('/opt/render/project/src/data', 'nightmonopoly.db')
+    data_dir = '/opt/render/project/src/data'
+    os.makedirs(data_dir, exist_ok=True)
+    db_path = os.path.join(data_dir, 'nightmonopoly.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

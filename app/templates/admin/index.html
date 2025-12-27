@@ -1,94 +1,78 @@
-<!-- app/templates/admin/index.html -->
+<!-- templates/admin/index.html -->
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Админка — NightMonopoly</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f8f9fa;
-      color: #2c3e50;
-      padding: 20px;
-    }
-    h1 {
-      color: #e74c3c;
-      text-align: center;
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      background: #f8f9fa; 
+      color: #2c3e50; 
+      padding: 20px; 
     }
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
       margin-bottom: 20px;
     }
+    h1 { color: #e74c3c; }
     .logout {
-      background: #c0392b;
-      color: white;
-      padding: 10px 15px;
-      text-decoration: none;
-      border-radius: 5px;
+      background: #c0392b; 
+      color: white; 
+      padding: 10px 15px; 
+      text-decoration: none; 
+      border-radius: 5px; 
       font-size: 14px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-      background: white;
+    .card-form {
+      background: white; 
+      padding: 20px; 
+      margin: 20px 0; 
+      border-radius: 8px; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    th, td {
-      border: 1px solid #bdc3c7;
-      padding: 12px;
-      text-align: left;
-    }
-    th {
-      background: #34495e;
-      color: white;
-    }
-    tr:nth-child(even) {
-      background: #ecf0f1;
-    }
-    .btn {
-      padding: 8px 12px;
-      margin: 2px;
-      font-size: 13px;
-      border: none;
+    input, select, button { 
+      padding: 10px; 
+      margin: 5px; 
+      border: 1px solid #ddd; 
       border-radius: 4px;
-      cursor: pointer;
+    }
+    input[type="text"] { width: 250px; }
+    .btn {
+      border: none; 
+      cursor: pointer; 
+      font-size: 13px; 
+      padding: 8px 12px; 
+      border-radius: 4px;
     }
     .add { background: #27ae60; color: white; }
     .edit { background: #3498db; color: white; }
     .delete { background: #e74c3c; color: white; }
-    .form-inline {
-      display: inline;
-    }
-    .card-form {
-      background: white;
-      padding: 20px;
-      margin: 20px 0;
-      border-radius: 8px;
+    table {
+      width: 100%; 
+      border-collapse: collapse; 
+      margin: 20px 0; 
+      background: white; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    input, select {
-      padding: 10px;
-      margin: 5px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    th, td {
+      border: 1px solid #bdc3c7; 
+      padding: 12px; 
+      text-align: left;
     }
-    input[type="text"], input[type="url"] {
-      width: 250px;
-    }
+    th { background: #34495e; color: white; }
+    tr:nth-child(even) { background: #ecf0f1; }
     .flash {
-      background: #2ecc71;
-      color: white;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
+      padding: 10px; 
+      margin: 10px 0; 
+      border-radius: 5px; 
       text-align: center;
     }
-    .error { background: #e74c3c; }
-    .info { background: #3498db; }
+    .success { background: #2ecc71; color: white; }
+    .error { background: #e74c3c; color: white; }
+    .info { background: #3498db; color: white; }
   </style>
 </head>
 <body>
@@ -109,11 +93,12 @@
   <div class="card-form">
     <h2>➕ Добавить карточку</h2>
     <form method="POST" action="{{ url_for('main.add_card') }}">
-      <input type="text" name="text" placeholder="Текст карточки" required />
+      <input type="text" name="text" placeholder="Текст задания" required />
       <select name="level" required>
-        <option value="1">Уровень 1</option>
-        <option value="2">Уровень 2</option>
-        <option value="3">Уровень 3</option>
+        <option value="1">Уровень 1 (белый)</option>
+        <option value="2">Уровень 2 (жёлтый)</option>
+        <option value="3">Уровень 3 (фиолетовый)</option>
+        <option value="4">Уровень 4 (красный)</option>
       </select>
       <select name="orientation" required>
         <option value="М-Ж">М-Ж</option>
@@ -123,16 +108,24 @@
         <option value="Любая">Любая</option>
       </select>
       <select name="gender_combo" required>
-        <option value="Любой">Любой</option>
         <option value="Парень">Парень</option>
         <option value="Девушка">Девушка</option>
+        <option value="Любой">Любой</option>
       </select>
       <select name="target" required>
         <option value="Партнёр">Партнёр</option>
         <option value="Любой">Любой</option>
       </select>
-      <input type="url" name="image_url" placeholder="Ссылка на GIF/изображение (не обязательно)" />
       <button type="submit" class="btn add">Добавить карточку</button>
+    </form>
+  </div>
+
+  <!-- Форма добавления штрафа -->
+  <div class="card-form">
+    <h2>⚖️ Добавить штраф</h2>
+    <form method="POST" action="{{ url_for('main.add_penalty') }}">
+      <input type="text" name="text" placeholder="Текст штрафа (начинается с уровня 2)" required />
+      <button type="submit" class="btn add">Добавить штраф</button>
     </form>
   </div>
 
@@ -142,11 +135,10 @@
     <tr>
       <th>ID</th>
       <th>Текст</th>
-      <th>Уровень</th>
-      <th>Ориентация</th>
-      <th>Гендер</th>
+      <th>Ур.</th>
+      <th>Ориент</th>
+      <th>Пол</th>
       <th>Цель</th>
-      <th>GIF</th>
       <th>Действия</th>
     </tr>
     {% for card in cards %}
@@ -157,10 +149,30 @@
       <td>{{ card.orientation }}</td>
       <td>{{ card.gender_combo }}</td>
       <td>{{ card.target }}</td>
-      <td>{% if card.image_url %}✅{% else %}—{% endif %}</td>
       <td>
-        <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn edit">Редактировать</a>
-        <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" class="form-inline" onsubmit="return confirm('Удалить карточку?')">
+        <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn edit">Редакт</a>
+        <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" style="display:inline;" onsubmit="return confirm('Удалить карточку?')">
+          <button type="submit" class="btn delete">Удалить</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <!-- Таблица штрафов -->
+  <h2>⚖️ Штрафы</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Текст штрафа</th>
+      <th>Действия</th>
+    </tr>
+    {% for penalty in penalty_cards %}
+    <tr>
+      <td>{{ penalty.id }}</td>
+      <td>{{ penalty.text }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('main.delete_penalty', id=penalty.id) }}" style="display:inline;" onsubmit="return confirm('Удалить штраф?')">
           <button type="submit" class="btn delete">Удалить</button>
         </form>
       </td>
