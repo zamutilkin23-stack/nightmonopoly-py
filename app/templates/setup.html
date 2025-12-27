@@ -1,0 +1,39 @@
+<!-- templates/setup.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Настройка игроков</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; background: #000; color: #fff; }
+    .player { margin: 20px 0; padding: 15px; background: #1e1e1e; border-radius: 10px; }
+    input, select { width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 5px; }
+    button { background: #e74c3c; color: white; padding: 15px 30px; border: none; border-radius: 30px; font-size: 18px; }
+    .back { color: #888; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h2>✏️ Введите игроков</h2>
+  <form method="POST" action="/start">
+    {% for i in range(count) %}
+    <div class="player">
+      <h3>Игрок {{ i + 1 }}</h3>
+      <input type="text" name="name{{ i + 1 }}" placeholder="Имя" required>
+      <select name="gender{{ i + 1 }}" required>
+        <option value="Парень">Парень</option>
+        <option value="Девушка">Девушка</option>
+      </select>
+      <select name="orientation{{ i + 1 }}" required>
+        <option value="Гетеро">Гетеро</option>
+        <option value="Би">Би</option>
+        <option value="Лесби">Лесби</option>
+        <option value="Другое">Другое</option>
+        <option value="Любая">Любая</option>
+      </select>
+    </div>
+    {% endfor %}
+    <button type="submit">▶️ Начать игру</button>
+  </form>
+  <a href="/players" class="back">← Назад</a>
+</body>
+</html>

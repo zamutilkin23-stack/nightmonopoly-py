@@ -1,110 +1,98 @@
 # app/routes.py
-from flask import Blueprint
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from .extensions import db
+from .models import Card
 
-main = Blueprint('main', __name__)  # ✅ Имя и атрибут
+main = Blueprint('main', __name__)
 
+# === Главная ===
 @main.route('/')
 def index():
-    return "Добро пожаловать на NightFanta!"  # Для теста
+    return render_template('index.html')
 
+# === Выбор игроков ===
+@main.route('/players')
+def players():
+    return render_template('players.html')
 
-# === Тест админки ===
-@main.route('/test-admin')
-def test_admin():
-    logged_in = session.get('admin_logged_in')
-    return f"<h1>Тест админки</h1><p>Вход: <b>{'да' if logged_in else 'нет'}</b></p><a href='/admin-secret'>Войти</a>"
+# === Настройка игроков ===
+@main.route('/setup')
+def setup():
+    count = int(request.args.get('count', 2))
+    return render_template('setup.html', count=count)
 
+# === Обработка формы игроков ===
+@main.route('/start', methods=['POST'])
+def start():
+    players = []
+    for i in range(1, 5):
+        name = request.form.get(f'name{i}')
+        if name:
+            gender = request.form.get(f'gender{i}')
+            orientation = request.form.get(f'orientation{i}')
+            players.append({
+                'name': name,
+                'gender': gender,
+                'orientation': orientation
+            })
 
-# === Тайный вход ===
-@main.route('/admin-secret')
-def admin_secret():
-    return redirect(url_for('main.admin_login', next=url_for('main.admin')))
+    if len(players) < 2:
+        flash('Нужно хотя бы 2 игрока', 'error')
+        return redirect(url_for('main.players'))
 
+    session['players'] = players
+    session['current'] = 0
+    session['level'] = 1  # Начинаем с 1 уровня
+    return redirect(url_for('main.game'))
 
-# === Админка: вход ===
-@main.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    next_page = request.args.get('next') or url_for('main.index')
+# === Игра: показ карточки ===
+@main.route('/game')
+def game():
+    if 'players' not in session:
+        return redirect(url_for('main.players'))
 
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+    players = session['players']
+    current = session['current']
+    current_player = players[current]
+    next_player = players[(current + 1) % len(players)]
+    level = session['level']
 
-        # ✅ Проверка
-        if username == 'Vladimirovich' and password == 'Timur':
-            session['admin_logged_in'] = True
-            flash('✅ Добро пожаловать, командир!', 'success')
-            return redirect(next_page)
-        else:
-            flash('❌ Неверный логин или пароль', 'error')
+    # Фильтр по ориентации
+    allowed_orientations = ['Любая']
+    if current_player['orientation'] == 'Би':
+        allowed_orientations += ['Гетеро', 'Лесби', 'Другое']
+    else:
+        allowed_orientations.append(current_player['orientation'])
 
-    return render_template('admin/login.html', next=next_page)
+    # Фильтр по полу
+    allowed_genders = [current_player['gender'], 'Любой']
 
+    # Ищем карточку
+    card = Card.query.filter(
+        Card.level == level,
+        Card.orientation.in_(allowed_orientations),
+        Card.gender.in_(allowed_genders),
+        Card.target.in_(['Партнёр', 'Любой'])
+    ).order_by(db.func.random()).first()
 
-# === Админка: главная ===
-@main.route('/admin')
-def admin():
-    if not session.get('admin_logged_in'):
-        return redirect(url_for('main.admin_login'))
-    cards = Card.query.all()
-    return render_template('admin/index.html', cards=cards)
+    # Если нет — переходим на следующий уровень
+    if not card and level < 4:
+        session['level'] += 1
+        flash(f'🎉 Переход на уровень {session["level"]}!', 'info')
+        return redirect(url_for('main.game'))
 
+    # Если и на 4 уровне нет — игра окончена
+    if not card:
+        flash('🎉 Все карточки пройдены! Игра завершена.', 'success')
+        return redirect(url_for('main.players'))
 
-# === Админка: выход ===
-@main.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    flash('Вы вышли из админки', 'info')
-    return redirect(url_for('main.index'))
-# === Добавить карточку ===
-@main.route('/admin/add-card', methods=['POST'])
-def add_card():
-    try:
-        card = Card(
-            text=request.form['text'].strip(),
-            level=int(request.form['level']),
-            orientation=request.form['orientation'],
-            gender=request.form['gender'],
-            target=request.form['target'],
-            image_url=request.form.get('image_url') or None
-        )
-        db.session.add(card)
-        db.session.commit()
-        flash('✅ Карточка добавлена', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'❌ Ошибка: {e}', 'error')
-    return redirect(url_for('main.admin'))
+    return render_template('game.html', card=card, player=current_player, next=next_player)
 
-# === Редактировать ===
-@main.route('/admin/edit-card/<int:id>', methods=['GET', 'POST'])
-def edit_card(id):
-    card = Card.query.get_or_404(id)
-    if request.method == 'POST':
-        try:
-            card.text = request.form['text'].strip()
-            card.level = int(request.form['level'])
-            card.orientation = request.form['orientation']
-            card.gender = request.form['gender']
-            card.target = request.form['target']
-            card.image_url = request.form.get('image_url') or None
-            db.session.commit()
-            flash('✅ Обновлено', 'success')
-            return redirect(url_for('main.admin'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'❌ Ошибка: {e}', 'error')
-    return render_template('admin/edit_card.html', card=card)
+# === Следующий игрок ===
+@main.route('/next')
+def next_player():
+    if 'players' in session:
+        session['current'] = (session['current'] + 1) % len(session['players'])
+    return redirect(url_for('main.game'))
 
-# === Удалить ===
-@main.route('/admin/delete-card/<int:id>', methods=['POST'])
-def delete_card(id):
-    try:
-        card = Card.query.get_or_404(id)
-        db.session.delete(card)
-        db.session.commit()
-        flash('🗑️ Удалено', 'info')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'❌ Ошибка: {e}', 'error')
-    return redirect(url_for('main.admin'))
+# === Остальное: админка, вход и т.д. — остаётся как есть ===

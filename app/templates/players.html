@@ -5,138 +5,19 @@
   <title>Игроки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: #000;
-      color: #fff;
-      padding: 40px 20px;
-      text-align: center;
-    }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-    }
-    h2 {
-      color: #e74c3c;
-      margin-bottom: 20px;
-    }
-    .player {
-      background: #1a1a1a;
-      padding: 20px;
-      margin: 15px 0;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #555;
-      border-radius: 8px;
-      background: #2c2c2c;
-      color: #fff;
-      font-size: 16px;
-    }
-    input::placeholder {
-      color: #aaa;
-    }
-    button {
-      background: #e74c3c;
-      color: white;
-      padding: 14px 30px;
-      margin: 20px 0;
-      border: none;
-      border-radius: 30px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #c0392b;
-    }
-    .back {
-      color: #888;
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .back:hover {
-      color: #aaa;
-    }
+    body { font-family: Arial; text-align: center; padding: 40px; background: #000; color: #fff; }
+    h2 { color: #e74c3c; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 500px; margin: 30px auto; }
+    .btn { display: block; padding: 20px; background: #e74c3c; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>👥 Введите игроков</h2>
-
-    <form method="POST">
-      <!-- Игрок 1 -->
-      <div class="player">
-        <input type="text" name="name1" placeholder="Имя игрока 1" required />
-        <select name="gender1" required>
-          <option value="Парень">Парень</option>
-          <option value="Девушка">Девушка</option>
-        </select>
-        <select name="orientation1" required>
-          <option value="Гетеро">Гетеро</option>
-          <option value="Би">Би</option>
-          <option value="Лесби">Лесби</option>
-          <option value="Другое">Другое</option>
-        </select>
-      </div>
-
-      <!-- Игрок 2 -->
-      <div class="player">
-        <input type="text" name="name2" placeholder="Имя игрока 2" required />
-        <select name="gender2" required>
-          <option value="Парень">Парень</option>
-          <option value="Девушка">Девушка</option>
-        </select>
-        <select name="orientation2" required>
-          <option value="Гетеро">Гетеро</option>
-          <option value="Би">Би</option>
-          <option value="Лесби">Лесби</option>
-          <option value="Другое">Другое</option>
-        </select>
-      </div>
-
-      <!-- Игрок 3 -->
-      <div class="player">
-        <input type="text" name="name3" placeholder="Имя игрока 3 (необязательно)" />
-        <select name="gender3">
-          <option value="">— Пол —</option>
-          <option value="Парень">Парень</option>
-          <option value="Девушка">Девушка</option>
-        </select>
-        <select name="orientation3">
-          <option value="">— Ориентация —</option>
-          <option value="Гетеро">Гетеро</option>
-          <option value="Би">Би</option>
-          <option value="Лесби">Лесби</option>
-          <option value="Другое">Другое</option>
-        </select>
-      </div>
-
-      <!-- Игрок 4 -->
-      <div class="player">
-        <input type="text" name="name4" placeholder="Имя игрока 4 (необязательно)" />
-        <select name="gender4">
-          <option value="">— Пол —</option>
-          <option value="Парень">Парень</option>
-          <option value="Девушка">Девушка</option>
-        </select>
-        <select name="orientation4">
-          <option value="">— Ориентация —</option>
-          <option value="Гетеро">Гетеро</option>
-          <option value="Би">Би</option>
-          <option value="Лесби">Лесби</option>
-          <option value="Другое">Другое</option>
-        </select>
-      </div>
-
-      <button type="submit">▶️ Начать игру</button>
-    </form>
-
-    <a href="/" class="back">← На главную</a>
+  <h2>👥 Выберите количество игроков</h2>
+  <div class="grid">
+    <a href="/setup?count=2" class="btn">М + Ж</a>
+    <a href="/setup?count=3" class="btn">М + Ж + М</a>
+    <a href="/setup?count=3" class="btn">Ж + М + Ж</a>
+    <a href="/setup?count=4" class="btn">М + Ж + М + Ж</a>
   </div>
 </body>
 </html>

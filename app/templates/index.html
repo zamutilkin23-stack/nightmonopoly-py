@@ -1,25 +1,27 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>NightFanta</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: 'Arial'; text-align: center; padding: 60px 20px 80px; background: #000; color: #fff; }
+    body { font-family: 'Arial'; text-align: center; padding: 40px 20px; background: #000; color: #fff; }
     h1 { color: #e74c3c; }
-    .btn { padding: 15px 30px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; font-weight: bold; }
+    p { color: #aaa; margin: 20px 0; }
+    .btn { margin: 10px; padding: 15px 25px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; font-weight: bold; }
     .admin-link {
-      position: fixed; left: 20px; bottom: 20px; color: #333; font-size: 24px; text-decoration: none; opacity: 0.1;
-      transition: opacity 0.3s; z-index: 1000;
+      position: fixed; left: 20px; bottom: 20px; color: #333; font-size: 24px; opacity: 0.1; z-index: 1000;
     }
-    .admin-link:hover { opacity: 0.5; color: #e74c3c; }
-    .admin-link:active { opacity: 1; color: #e74c3c; }
+    .admin-link:hover, .admin-link:active { opacity: 1; color: #e74c3c; }
   </style>
 </head>
 <body>
-  <h1>🔞 NightFanta</h1>
-  <p>Контент для взрослых. Вам есть 18?</p>
-  <br>
-  <a href="/players" class="btn">Да</a>
-  <a href="#" class="admin-link" title="Вход в админку">...</a>
+  <h1>🔥 NightFanta</h1>
+  <p>Игра для пар и компаний после 18 лет</p>
+  <p>Вы подтверждаете, что вам есть 18?</p>
+  <a href="/players" class="btn">Да, мне есть 18</a>
+  <a href="https://google.com" class="btn" style="background:#7f8c8d">Нет</a>
+
+  <a href="/admin-secret" class="admin-link">...</a>
 </body>
 </html>
