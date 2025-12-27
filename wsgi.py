@@ -4,10 +4,10 @@ from app.extensions import db
 
 app = create_app()
 
-# Создаём таблицы при старте
+# Создаём таблицы при запуске
 with app.app_context():
     db.create_all()
-    print("✅ Таблицы созданы: card")
+    print("✅ Таблицы 'card' и 'penalty_card' — созданы")
 
 if __name__ == "__main__":
     import os

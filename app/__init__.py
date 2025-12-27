@@ -5,9 +5,10 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'dev-night-2024'
+    # Жёстко фиксируем ключ — иначе сессии слетают
+    app.config['SECRET_KEY'] = 'nightmonopoly-secret-key-2025'
 
-    # Путь к базе на диске
+    # Путь к базе на диске Render
     data_dir = '/opt/render/project/src/data'
     os.makedirs(data_dir, exist_ok=True)
     db_path = os.path.join(data_dir, 'nightmonopoly.db')

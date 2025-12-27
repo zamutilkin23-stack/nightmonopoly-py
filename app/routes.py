@@ -2,101 +2,64 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from .extensions import db
 from .models import Card
-import random
 
 main = Blueprint('main', __name__)
 
 
-# === Главная: проверка 18+ ===
+# === Главная — проверка 18+ ===
 @main.route('/')
 def index():
     return render_template('index.html')
 
 
-# === Ввод игроков ===
+# === Тест: игроки (упрощённо) ===
 @main.route('/players', methods=['GET', 'POST'])
 def players():
     if request.method == 'POST':
         players = []
         for i in range(1, 5):
             name = request.form.get(f'name{i}')
-            if not name:
-                continue
-            gender = request.form.get(f'gender{i}', 'Любой')
-            orientation = request.form.get(f'orientation{i}', 'Любая')
-            players.append({
-                'name': name,
-                'gender': gender,
-                'orientation': orientation
-            })
-
+            if name:
+                gender = request.form.get(f'gender{i}') or 'Любой'
+                orientation = request.form.get(f'orientation{i}') or 'Любая'
+                players.append({'name': name, 'gender': gender, 'orientation': orientation})
         if len(players) < 2:
             flash('Минимум 2 игрока', 'error')
             return render_template('players.html')
-
         session['players'] = players
         session['current'] = 0
         return redirect(url_for('main.game'))
-
     return render_template('players.html')
 
 
-# === Игра: показ карточки ===
 @main.route('/game')
 def game():
-    players = session.get('players')
-    if not players or len(players) < 2:
+    if 'players' not in session:
         return redirect(url_for('main.players'))
-
-    current = session['current']
-    current_player = players[current]
-    next_idx = (current + 1) % len(players)
-    next_player = players[next_idx]
-
-    # Фильтрация по ориентации
-    allowed_orientations = ['Любая']
-    if current_player['orientation'] == 'Би':
-        allowed_orientations += ['Гетеро', 'Лесби', 'Другое']
-    else:
-        allowed_orientations.append(current_player['orientation'])
-
-    card = Card.query.filter(
-        Card.orientation.in_(allowed_orientations),
-        Card.gender.in_([current_player['gender'], 'Любой']),
-        Card.target.in_(['Партнёр', 'Любой'])
-    ).order_by(db.func.random()).first()
-
-    if not card:
-        card = Card.query.order_by(db.func.random()).first()
-
-    return render_template('game.html', card=card, player=current_player, next=next_player)
+    return "<h1>🎮 Игра запущена!</h1><p>Карточки ещё не подключены, но структура работает.</p>"
 
 
-# === Следующий игрок ===
-@main.route('/next')
-def next_player():
-    if 'players' in session:
-        session['current'] = (session['current'] + 1) % len(session['players'])
-    return redirect(url_for('main.game'))
-
-
-# === Тайный вход: троеточие → сюда ===
+# === Тайный вход ===
 @main.route('/admin-secret')
 def admin_secret():
     return redirect(url_for('main.admin_login', next=url_for('main.admin')))
 
 
-# === Админка: вход с возвратом ===
+# === Админка: вход — с сессией ===
 @main.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     next_page = request.args.get('next') or url_for('main.index')
 
     if request.method == 'POST':
-        if request.form['username'] == 'Vladimirovich' and request.form['password'] == 'Timur':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        if username == 'Vladimirovich' and password == 'Timur':
             session['admin_logged_in'] = True
-            flash('✅ Добро пожеловать, командир', 'success')
+            flash('✅ Добро пожаловать, командир', 'success')
             return redirect(next_page)
-        flash('❌ Неверный логин или пароль', 'error')
+        else:
+            flash('❌ Неверный логин или пароль', 'error')
 
     return render_template('admin/login.html', next=next_page)
 
