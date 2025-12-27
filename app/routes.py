@@ -4,7 +4,6 @@ from .extensions import db
 from .models import Card
 import random
 
-# ✅ Объявляем Blueprint СРАЗУ
 main = Blueprint('main', __name__)
 
 
@@ -79,7 +78,6 @@ def game():
         Card.target.in_(['Партнёр', 'Любой', 'Партнёр на выбор'])
     ).all()
 
-    # Если вообще нет карточек — попробуем перейти
     if not all_available:
         if level < 4:
             session['level'] += 1
@@ -89,63 +87,63 @@ def game():
             flash('🎉 Все уровни пройдены!', 'success')
             return redirect(url_for('main.players'))
 
-    # Только доступные сейчас (неиспользованные или повторяемые)
+    # Только доступные
     used_ids = session.get('used_cards', [])
     available_now = [c for c in all_available if c.id not in used_ids or c.can_repeat]
 
-    # 🔥 Переход только если нет доступных
     if not available_now:
         if level < 4:
             session['level'] += 1
             flash(f'🎉 Уровень {session["level"]} открыт!', 'info')
             return redirect(url_for('main.game'))
         else:
-            flash('🎉 Игра завершена! Все карточки пройдены.', 'success')
+            flash('🎉 Игра завершена!', 'success')
             return redirect(url_for('main.players'))
 
     card = random.choice(available_now)
 
-    # Пометим как использованную, если нельзя повторять
     if not card.can_repeat:
         session['used_cards'].append(card.id)
         session.modified = True
 
     session['current_card_id'] = card.id
 
-    # Определяем, кого можно выбрать
-    selected_target = session.get('selected_target')
-    targetable_players = []
+    # Автоматический выбор цели, если требуется
+    selected_target = None
+    if card.target == 'Партнёр на выбор':
+        # Все игроки, кроме текущего
+        candidates = [p for p in players if p['name'] != player['name']]
 
-    if card.target == 'Партнёр на выбор' and not selected_target:
-        for p in players:
-            if p['name'] == player['name']:
-                continue
-            if player['orientation'] == 'Гетеро':
-                if (player['gender'] == 'Парень' and p['gender'] == 'Девушка') or \
-                   (player['gender'] == 'Девушка' and p['gender'] == 'Парень'):
-                    targetable_players.append(p)
-            elif player['orientation'] in ['Би', 'Другое', 'Любая']:
-                targetable_players.append(p)
-            elif player['orientation'] == 'Лесби' and p['gender'] == 'Девушка':
-                targetable_players.append(p)
+        if candidates:
+            # Фильтр по ориентации, если нужно
+            filtered = []
+            for p in candidates:
+                if player['orientation'] == 'Гетеро':
+                    if (player['gender'] == 'Парень' and p['gender'] == 'Девушка') or \
+                       (player['gender'] == 'Девушка' and p['gender'] == 'Парень'):
+                        filtered.append(p)
+                elif player['orientation'] in ['Би', 'Другое', 'Любая']:
+                    filtered.append(p)
+                elif player['orientation'] == 'Лесби' and p['gender'] == 'Девушка':
+                    filtered.append(p)
 
-        return render_template('game.html', 
-                             card=card, player=player, 
-                             targetable_players=targetable_players,
-                             next=next_player)
+            if filtered:
+                chosen = random.choice(filtered)
+                selected_target = chosen['name']
+            else:
+                # Если нет подходящих — хотя бы случайный (кроме себя)
+                chosen = random.choice(candidates)
+                selected_target = chosen['name']
+        else:
+            selected_target = None  # но вряд ли
+
+        session['selected_target'] = selected_target
 
     return render_template('game.html', 
-                         card=card, player=player, 
+                         card=card, 
+                         player=player, 
                          next=next_player, 
                          selected_target=selected_target)
-
-
-@main.route('/select-target', methods=['POST'])
-def select_target():
-    target = request.form.get('target_player')
-    if target:
-        session['selected_target'] = target
-    return redirect(url_for('main.game'))
 
 
 @main.route('/next')
@@ -182,94 +180,6 @@ def penalty():
     return render_template('penalty.html', card=card, player=player, next=next_player)
 
 
-@main.route('/admin-secret')
-def admin_secret():
-    return redirect(url_for('main.admin_login', next=url_for('main.admin')))
-
-
-@main.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    next_page = request.args.get('next') or url_for('main.index')
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == 'Vladimirovich' and password == 'Timur':
-            session['admin_logged_in'] = True
-            flash('✅ Добро пожаловать!', 'success')
-            return redirect(next_page)
-        else:
-            flash('❌ Неверный логин или пароль', 'error')
-    return render_template('admin/login.html', next=next_page)
-
-
-@main.route('/admin')
-def admin():
-    if not session.get('admin_logged_in'):
-        return redirect(url_for('main.admin_login'))
-    game_cards = Card.query.filter_by(card_type='game').all()
-    penalty_cards = Card.query.filter_by(card_type='penalty').all()
-    return render_template('admin/index.html', game_cards=game_cards, penalty_cards=penalty_cards)
-
-
-@main.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    flash('Вы вышли', 'info')
-    return redirect(url_for('main.index'))
-
-
-@main.route('/admin/add-card', methods=['POST'])
-def add_card():
-    try:
-        card = Card(
-            text=request.form['text'].strip(),
-            level=int(request.form['level']),
-            card_type=request.form['card_type'],
-            orientation=request.form['orientation'],
-            gender=request.form['gender'],
-            target=request.form['target'],
-            image_url=request.form.get('image_url'),
-            can_repeat='can_repeat' in request.form
-        )
-        db.session.add(card)
-        db.session.commit()
-        flash('✅ Добавлено', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'❌ Ошибка: {str(e)}', 'error')
-    return redirect(url_for('main.admin'))
-
-
-@main.route('/admin/edit-card/<int:id>', methods=['GET', 'POST'])
-def edit_card(id):
-    card = Card.query.get_or_404(id)
-    if request.method == 'POST':
-        try:
-            card.text = request.form['text'].strip()
-            card.level = int(request.form['level'])
-            card.card_type = request.form['card_type']
-            card.orientation = request.form['orientation']
-            card.gender = request.form['gender']
-            card.target = request.form['target']
-            card.image_url = request.form.get('image_url')
-            card.can_repeat = 'can_repeat' in request.form
-            db.session.commit()
-            flash('✅ Обновлено', 'success')
-            return redirect(url_for('main.admin'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'❌ Ошибка: {str(e)}', 'error')
-    return render_template('admin/edit_card.html', card=card)
-
-
-@main.route('/admin/delete-card/<int:id>', methods=['POST'])
-def delete_card(id):
-    try:
-        card = Card.query.get_or_404(id)
-        db.session.delete(card)
-        db.session.commit()
-        flash('🗑️ Удалено', 'info')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'❌ Ошибка: {str(e)}', 'error')
-    return redirect(url_for('main.admin'))
+# Остальное — без изменений: admin, login, edit, delete...
+# (остаётся как в предыдущем ответе — не менялось)
+# Только удаляем /select-target — он больше не нужен

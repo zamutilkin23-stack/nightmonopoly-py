@@ -67,26 +67,10 @@
       border-radius: 30px;
       margin: 8px 5px;
       font-size: 1em;
-      min-width: 130px;
     }
     .penalty-btn {
       background: #3498db;
     }
-    .target-select {
-      margin: 15px 0;
-      font-size: 1em;
-    }
-    select {
-      display: block;
-      width: 80%;
-      margin: 10px auto;
-      padding: 10px;
-      border-radius: 8px;
-      background: #333;
-      color: #fff;
-      font-size: 1em;
-    }
-    option { background: #333; color: #fff; }
     .admin-link {
       position: fixed;
       left: 15px;
@@ -111,31 +95,18 @@
       <div class="background"></div>
     {% endif %}
     <div class="text">{{ card.text }}</div>
-
-    {% if selected_target %}
-      <div class="target">👉 <strong>{{ selected_target }}</strong></div>
-    {% elif card.target == 'Партнёр на выбор' and not selected_target %}
-      <div class="target-select">
-        <p><strong>Кому задание?</strong></p>
-        <form method="POST" action="/select-target">
-          <select name="target_player" required>
-            {% for p in targetable_players %}
-              <option value="{{ p.name }}">{{ p.name }}</option>
-            {% endfor %}
-          </select>
-          <button type="submit" class="btn" style="background:#3498db">Выбрать</button>
-        </form>
-      </div>
-    {% endif %}
   </div>
 
-  {% if card.target != 'Партнёр на выбор' or selected_target %}
-    <p class="info"><strong>Следующий:</strong> {{ next.name }}</p>
-    <div>
-      <a href="/next" class="btn">Выполнено →</a>
-      <a href="/penalty" class="btn penalty-btn">Не выполнено →</a>
-    </div>
+  <!-- Если выбрана цель — показываем -->
+  {% if selected_target %}
+    <div class="target">👉 <strong>{{ selected_target }}</strong></div>
   {% endif %}
+
+  <p class="info"><strong>Следующий:</strong> {{ next.name }}</p>
+  <div>
+    <a href="/next" class="btn">Выполнено →</a>
+    <a href="/penalty" class="btn penalty-btn">Не выполнено →</a>
+  </div>
 
   <a href="/admin-secret" class="admin-link">...</a>
 </body>
