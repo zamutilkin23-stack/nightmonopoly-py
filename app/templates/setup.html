@@ -2,44 +2,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Игроки</title>
+  <title>Настройка</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: Arial; padding: 20px; background: #000; color: #fff; }
-    .container { max-width: 500px; margin: 0 auto; }
-    h2 { color: #e74c3c; text-align: center; }
-    .player { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin: 15px 0; }
-    input, select { padding: 10px; border: none; border-radius: 5px; background: #333; color: white; }
-    .name { grid-column: 1; }
-    .gender { grid-column: 2; }
-    .orientation { grid-column: 3; }
-    button { background: #e74c3c; color: white; padding: 14px; border: none; border-radius: 30px; width: 100%; font-size: 18px; margin-top: 20px; }
-    .back { display: block; text-align: center; color: #888; margin-top: 20px; text-decoration: none; }
+    .btn { padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; }
+    .form { max-width: 500px; margin: 30px auto; }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 6px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>👥 Игроки</h2>
-    <form method="POST" action="/start">
-      {% for i in range(count) %}
-      <div class="player">
-        <input type="text" name="name{{ i + 1 }}" placeholder="Имя" class="name" required>
-        <select name="gender{{ i + 1 }}" class="gender" required>
-          <option value="Парень">Парень</option>
-          <option value="Девушка">Девушка</option>
-        </select>
-        <select name="orientation{{ i + 1 }}" class="orientation" required>
-          <option value="Гетеро">Гетеро</option>
-          <option value="Би">Би</option>
-          <option value="Лесби">Лесби</option>
-          <option value="Другое">Другое</option>
-          <option value="Любая">Любая</option>
-        </select>
-      </div>
-      {% endfor %}
-      <button type="submit">▶️ Начать игру</button>
-    </form>
-    <a href="/players" class="back">← Назад</a>
-  </div>
+  <h2>📝 Введите имена и настройки</h2>
+  <form method="POST" action="/start">
+    {% for i in range(1, count + 1) %}
+      <h3>Игрок {{ i }}</h3>
+      <input type="text" name="name{{ i }}" placeholder="Имя" required>
+      <select name="gender{{ i }}" required>
+        <option value="Парень">Парень</option>
+        <option value="Девушка">Девушка</option>
+      </select>
+      <select name="orientation{{ i }}" required>
+        <option value="Гетеро">Гетеро</option>
+        <option value="Би">Би</option>
+        <option value="Лесби">Лесби</option>
+        <option value="Другое">Другое</option>
+      </select>
+    {% endfor %}
+    <button type="submit" class="btn">Старт игры</button>
+  </form>
 </body>
 </html>

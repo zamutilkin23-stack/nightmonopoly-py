@@ -5,19 +5,21 @@
   <title>Игроки</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px; background: #000; color: #fff; }
-    h2 { color: #e74c3c; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 500px; margin: 30px auto; }
-    .btn { display: block; padding: 20px; background: #e74c3c; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; }
+    body { font-family: Arial; padding: 20px; background: #000; color: #fff; }
+    .btn { padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; }
+    .form { max-width: 500px; margin: 30px auto; }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 6px; }
   </style>
 </head>
 <body>
-  <h2>👥 Выберите количество игроков</h2>
-  <div class="grid">
-    <a href="/setup?count=2" class="btn">М + Ж</a>
-    <a href="/setup?count=3" class="btn">М + Ж + М</a>
-    <a href="/setup?count=3" class="btn">Ж + М + Ж</a>
-    <a href="/setup?count=4" class="btn">М + Ж + М + Ж</a>
-  </div>
+  <h2>👥 Укажите игроков</h2>
+  <form action="/setup" method="GET">
+    <select name="count">
+      <option value="2">2 игрока</option>
+      <option value="3">3 игрока</option>
+      <option value="4">4 игрока</option>
+    </select>
+    <button type="submit" class="btn">Далее</button>
+  </form>
 </body>
 </html>

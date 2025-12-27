@@ -1,6 +1,6 @@
 [
   {
-    "text": "Расскажи о самом смешном моменте в своей интимной жизни",
+    "text": "Скажи комплимент каждому",
     "level": 1,
     "card_type": "game",
     "orientation": "Любая",
@@ -10,47 +10,17 @@
     "image_url": null
   },
   {
-    "text": "Поцелуй в шею игрока на твой выбор",
+    "text": "Поцелуй в шею выбранному игроку",
     "level": 2,
     "card_type": "game",
     "orientation": "Любая",
     "gender": "Любой",
-    "target": "Любой",
+    "target": "Партнёр на выбор",
     "can_repeat": false,
     "image_url": "https://i.gifer.com/7KZv.gif"
-  },
-  {
-    "text": "Покажи, как ты флиртуешь, будто тебе 18 и ты в баре",
-    "level": 1,
-    "card_type": "game",
-    "orientation": "Любая",
-    "gender": "Любой",
-    "target": "Любой",
-    "can_repeat": false,
-    "image_url": null
-  },
-  {
-    "text": "Сделай комплимент каждому, начиная со слова 'ты такой...'",
-    "level": 1,
-    "card_type": "game",
-    "orientation": "Любая",
-    "gender": "Любой",
-    "target": "Любой",
-    "can_repeat": false,
-    "image_url": null
   },
   {
     "text": "Ты не справился — поцелуй в шею соседа",
-    "level": 2,
-    "card_type": "penalty",
-    "orientation": "Любая",
-    "gender": "Любой",
-    "target": "Любой",
-    "can_repeat": true,
-    "image_url": "https://i.gifer.com/7KZv.gif"
-  },
-  {
-    "text": "Сделай массаж плеч игроку слева",
     "level": 2,
     "card_type": "penalty",
     "orientation": "Любая",

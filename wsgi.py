@@ -7,12 +7,17 @@ import json
 
 app = create_app()
 
+# Создаём контекст приложения
 with app.app_context():
+    # Создаём папку data, если её нет
+    if not os.path.exists('data'):
+        os.makedirs('data')
+
+    # Создаём таблицы
     db.create_all()
 
-    if db.session.query(Card).first():
-        print("✅ База заполнена")
-    else:
+    # Если база пустая — загружаем карточки
+    if Card.query.first() is None:
         seed_path = os.path.join(app.root_path, '..', 'cards_seed.json')
         if os.path.exists(seed_path):
             with open(seed_path, 'r', encoding='utf-8') as f:
@@ -30,7 +35,7 @@ with app.app_context():
                     )
                     db.session.add(card)
                 db.session.commit()
-            print("✅ Карточки загружены")
+            print("✅ Карточки загружены из cards_seed.json")
         else:
             print("⚠️ Файл cards_seed.json не найден")
 

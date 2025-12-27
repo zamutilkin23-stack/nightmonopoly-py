@@ -1,3 +1,4 @@
+<!-- templates/game.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,17 +25,8 @@
       opacity: 0.15;
       z-index: 0;
     }
-    .text {
-      position: relative;
-      z-index: 1;
-      font-size: 1.4em;
-      line-height: 1.5;
-    }
-    .target {
-      font-size: 1.2em;
-      color: #3498db;
-      margin: 10px 0;
-    }
+    .text { position: relative; z-index: 1; font-size: 1.4em; line-height: 1.5; }
+    .target { font-size: 1.2em; color: #3498db; margin: 10px 0; }
     .btn {
       padding: 12px 24px;
       background: #e74c3c;
@@ -43,23 +35,9 @@
       border-radius: 30px;
       margin: 8px;
     }
-    .choice-btn {
-      background: #3498db;
-    }
-    .target-select {
-      margin: 20px 0;
-      font-size: 1.2em;
-    }
-    select {
-      padding: 10px;
-      font-size: 1em;
-      border-radius: 5px;
-      background: #333;
-      color: white;
-      width: 70%;
-      margin: 10px 0;
-    }
-    option { color: #fff; background: #333; }
+    .choice-btn { background: #3498db; }
+    .target-select { margin: 20px 0; font-size: 1.2em; }
+    select { padding: 10px; font-size: 1em; border-radius: 5px; background: #333; color: #fff; }
   </style>
 </head>
 <body>
@@ -71,7 +49,6 @@
     {% endif %}
     <div class="text">{{ card.text }}</div>
 
-    <!-- Если выбрана цель -->
     {% if selected_target %}
       <div class="target">👉 <strong>{{ selected_target }}</strong></div>
     {% elif card.target == 'Партнёр на выбор' and not selected_target %}
@@ -89,7 +66,6 @@
     {% endif %}
   </div>
 
-  <!-- Кнопки только если цель выбрана или не нужна -->
   {% if card.target != 'Партнёр на выбор' or selected_target %}
     <p><strong>Следующий:</strong> {{ next.name }}</p>
     <a href="/next" class="btn">Выполнено →</a>

@@ -1,22 +1,21 @@
 # app/__init__.py
 from flask import Flask
 from .extensions import db
-import os
 
 def create_app():
     app = Flask(__name__)
-    # 🔐 Жёсткий ключ — не меняется при перезапуске
-    app.config['SECRET_KEY'] = 'nightfanta-2025-secret-key'  # Не менять!
-
-    # Путь к базе
-    data_dir = '/opt/render/project/src/data'
-    os.makedirs(data_dir, exist_ok=True)
-    db_path = os.path.join(data_dir, 'nightfanta.db')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    
+    # Секретный ключ
+    app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
+    
+    # База данных SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///nightfanta.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # Инициализация расширений
     db.init_app(app)
 
+    # Регистрация Blueprint
     from .routes import main
     app.register_blueprint(main)
 

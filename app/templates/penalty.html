@@ -5,7 +5,7 @@
   <title>Штраф</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { background: #000; color: #fff; text-align: center; padding: 40px 20px; font-family: Arial; }
+    body { font-family: Arial; text-align: center; padding: 40px 20px; background: #000; color: #fff; }
     .card {
       border: 4px solid #3498db;
       border-radius: 15px;
@@ -13,26 +13,22 @@
       max-width: 500px;
       margin: 30px auto;
       background: #111;
-      position: relative;
-      overflow: hidden;
     }
     .text { font-size: 1.4em; line-height: 1.5; }
-    .btn { padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; }
-    .back { color: #888; text-decoration: none; font-size: 14px; }
+    .btn {
+      padding: 12px 24px;
+      background: #e74c3c;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+    }
   </style>
 </head>
 <body>
   <p><strong>Штраф для:</strong> {{ player.name }}</p>
-
   <div class="card">
     <div class="text">{{ card.text }}</div>
   </div>
-
-  <p><strong>Следующий:</strong> {{ next.name }}</p>
-
   <a href="/next" class="btn">Следующий игрок →</a>
-
-  <br><br>
-  <a href="/admin-secret" class="back">...</a>
 </body>
 </html>

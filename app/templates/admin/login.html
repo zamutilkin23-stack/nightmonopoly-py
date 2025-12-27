@@ -1,32 +1,21 @@
+<!-- templates/admin/login.html -->
 <!DOCTYPE html>
 <html>
 <head>
-  <title>🔐 Вход в админку</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Админка</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 60px; background: #121212; color: #fff; }
-    .form { max-width: 350px; margin: 0 auto; padding: 30px; background: #1e1e1e; border-radius: 12px; }
-    h2 { color: #e74c3c; }
-    input { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 6px; background: #333; color: white; }
-    button { width: 100%; padding: 12px; background: #e74c3c; color: white; border: none; border-radius: 30px; cursor: pointer; }
-    .error { color: #e74c3c; margin: 15px 0; }
-    .back { color: #888; text-decoration: none; }
+    body { font-family: Arial; padding: 40px; text-align: center; background: #000; color: #fff; }
+    input, button { padding: 10px; margin: 10px; font-size: 16px; }
+    button { background: #e74c3c; color: white; border: none; border-radius: 6px; }
   </style>
 </head>
 <body>
-  <div class="form">
-    <h2>🔐 Админка</h2>
-    {% with messages = get_flashed_messages(category_filter=["error"]) %}
-      {% if messages %}
-        <div class="error">❌ {{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
-    <form method="POST">
-      <input type="text" name="username" placeholder="Логин" required>
-      <input type="password" name="password" placeholder="Пароль" required>
-      <button type="submit">Войти</button>
-    </form>
-    <a href="/" class="back">← На сайт</a>
-  </div>
+  <h2>🔐 Вход в админку</h2>
+  <form method="POST">
+    <input type="text" name="username" placeholder="Логин" required>
+    <input type="password" name="password" placeholder="Пароль" required>
+    <button type="submit">Войти</button>
+  </form>
+  <a href="/" style="color: #888; font-size: 14px;">← Назад</a>
 </body>
 </html>
