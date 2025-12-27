@@ -19,10 +19,7 @@ except Exception as e:
     raise
 
 if __name__ == "__main__":
+    # Обязательно: PORT и host=0.0.0.0
     port = int(os.environ.get("PORT", 5000))
-    print(f"🚀 Запуск на порту {port}...")
+    print(f"🚀 Запуск на порту {port}, хост: 0.0.0.0")
     app.run(host="0.0.0.0", port=port)
-# Только для Render: не убирай
-if __name__ == "__main__":
-    print("🚀 Запуск сервера...")
-    app.run()
