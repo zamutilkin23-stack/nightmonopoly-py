@@ -1,35 +1,10 @@
 # app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from .extensions import db
-from .models import Card, PenaltyCard  # ✅ КРИТИЧЕСКИ ВАЖНО
-
-main = Blueprint('main', __name__)
-
-
-# === АДМИНКА: ВХОД ===
-@main.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if request.method == 'POST':
-        if request.form['username'] == 'Vladimirovich' and request.form['password'] == 'Timur':
-            session['admin_logged_in'] = True
-            return redirect(url_for('main.admin'))
-        flash('Неверный логин или пароль', 'error')
-    return render_template('admin/login.html')
-
-
-# === АДМИНКА: ГЛАВНАЯ ===
-@main.route('/admin')
-def admin():
-    if not session.get('admin_logged_in'):
-        return redirect(url_for('main.admin_login'))
-    cards = Card.query.all()
-    penalty_cards = PenaltyCard.query.all()
-    return render_template('admin/index.html', cards=cards, penalty_cards=penalty_cards)
-
-# app/routes.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-from .extensions import db
 from .models import Card, PenaltyCard
+import qrcode
+from io import BytesIO
+import base64
 
 main = Blueprint('main', __name__)
 
@@ -97,14 +72,12 @@ def delete_card(id):
     flash('Карточка удалена')
     return redirect(url_for('main.admin'))
 
-# === Главная ===
+# === Главная страница ===
 @main.route('/')
 def index():
-    import qrcode
-    from io import BytesIO
-    import base64
+    # Генерируем QR-код благодарности
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data("Спасибо за игру в NightMonopoly!")
+    qr.add_data("Спасибо за игру в NightMonopoly! 🌙")
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     buffer = BytesIO()
@@ -116,7 +89,9 @@ def index():
 @main.route('/card', methods=['POST'])
 def show_card():
     card_id = request.form.get('card_id', type=int)
+    if not card_id:
+        return render_template('card.html', error="Введите номер карточки")
     card = Card.query.get(card_id)
     if not card:
-        return render_template('card.html', error="Карточка не найдена")
+        return render_template('card.html', error=f"Карточка №{card_id} не найдена")
     return render_template('card.html', card=card)
