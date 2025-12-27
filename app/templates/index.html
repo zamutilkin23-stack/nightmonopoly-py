@@ -1,70 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>NightMonopoly</title>
+  <title>NightFanta</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: 'Arial';
-      text-align: center;
-      padding: 60px 20px 80px;
-      background: #000;
-      color: #fff;
-      margin: 0;
-      min-height: 100vh;
-    }
-    h1 {
-      color: #e74c3c;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #aaa;
-      font-size: 18px;
-      margin: 20px 0;
-    }
-    .btn {
-      display: inline-block;
-      padding: 15px 30px;
-      background: #e74c3c;
-      color: white;
-      text-decoration: none;
-      border-radius: 30px;
-      font-weight: bold;
-      font-size: 18px;
-      margin-top: 20px;
-    }
-    .btn:hover {
-      background: #c0392b;
-    }
+    body { font-family: 'Arial'; text-align: center; padding: 60px 20px 80px; background: #000; color: #fff; }
+    h1 { color: #e74c3c; }
+    .btn { padding: 15px 30px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; font-weight: bold; }
     .admin-link {
-      position: fixed;
-      left: 20px;
-      bottom: 20px;
-      color: #333;
-      font-size: 24px;
-      text-decoration: none;
-      opacity: 0.1;
-      transition: opacity 0.3s, color 0.3s;
-      z-index: 1000;
+      position: fixed; left: 20px; bottom: 20px; color: #333; font-size: 24px; text-decoration: none; opacity: 0.1;
+      transition: opacity 0.3s; z-index: 1000;
     }
-    .admin-link:hover {
-      opacity: 0.5;
-      color: #e74c3c;
-    }
-    .admin-link:active {
-      opacity: 1;
-      color: #e74c3c;
-    }
+    .admin-link:hover { opacity: 0.5; color: #e74c3c; }
+    .admin-link:active { opacity: 1; color: #e74c3c; }
   </style>
 </head>
 <body>
-  <h1>🔞 NightMonopoly</h1>
-  <p>Этот контент предназначен для лиц старше 18 лет.</p>
-  <p>Вы подтверждаете, что вам есть 18?</p>
+  <h1>🔞 NightFanta</h1>
+  <p>Контент для взрослых. Вам есть 18?</p>
   <br>
-  <a href="/players" class="btn">Да, мне есть 18</a>
-
-  <!-- Скрытый вход в админку -->
-  <a href="/admin-secret" class="admin-link" title="Вход в админку">...</a>
+  <a href="/players" class="btn">Да</a>
+  <a href="#" class="admin-link" title="Вход в админку">...</a>
 </body>
 </html>

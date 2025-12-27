@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: nightmonopoly-py
+    name: nightfanta-py
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: python wsgi.py
     disk:
-      name: nightmonopoly-data
+      name: nightfanta-data
       mountPath: /opt/render/project/src/data
