@@ -5,9 +5,10 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'nightfanta-2025-secret-key'
+    # 🔐 Жёсткий ключ — не меняется при перезапуске
+    app.config['SECRET_KEY'] = 'nightfanta-2025-secret-key'  # Не менять!
 
-    # Настройка базы
+    # Путь к базе
     data_dir = '/opt/render/project/src/data'
     os.makedirs(data_dir, exist_ok=True)
     db_path = os.path.join(data_dir, 'nightfanta.db')
@@ -16,8 +17,7 @@ def create_app():
 
     db.init_app(app)
 
-    # ✅ Регистрируем блюпринт
     from .routes import main
-    app.register_blueprint(main)  # 🔥 ЭТО ОБЯЗАТЕЛЬНО
+    app.register_blueprint(main)
 
     return app

@@ -94,5 +94,35 @@ def next_player():
     if 'players' in session:
         session['current'] = (session['current'] + 1) % len(session['players'])
     return redirect(url_for('main.game'))
+# === Тайный вход ===
+@main.route('/admin-secret')
+def admin_secret():
+    return redirect(url_for('main.admin_login', next=url_for('main.admin')))
+
+# === Вход в админку ===
+@main.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    next_page = request.args.get('next') or url_for('main.index')
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == 'Vladimirovich' and password == 'Timur':
+            session['admin_logged_in'] = True
+            flash('✅ Добро пожаловать, командир!', 'success')
+            return redirect(next_page)
+        else:
+            flash('❌ Неверный логин или пароль', 'error')
+    
+    return render_template('admin/login.html', next=next_page)
+
+# === Админка: главная ===
+@main.route('/admin')
+def admin():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('main.admin_login'))
+    cards = Card.query.all()
+    return render_template('admin/index.html', cards=cards)
 
 # === Остальное: админка, вход и т.д. — остаётся как есть ===
