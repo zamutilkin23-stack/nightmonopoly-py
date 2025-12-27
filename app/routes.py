@@ -7,22 +7,26 @@ import random
 main = Blueprint('main', __name__)
 
 
+# === Главная: 18+ ===
 @main.route('/')
 def index():
     return render_template('index.html')
 
 
+# === Выбор игроков ===
 @main.route('/players')
 def players():
     return render_template('players.html')
 
 
+# === Настройка количества игроков ===
 @main.route('/setup')
 def setup():
     count = int(request.args.get('count', 2))
     return render_template('setup.html', count=count)
 
 
+# === Старт игры: инициализация ===
 @main.route('/start', methods=['POST'])
 def start():
     players = []
@@ -44,10 +48,11 @@ def start():
     session['players'] = players
     session['current'] = 0
     session['level'] = 1
-    session['used_cards'] = []  # ✅ Обнуляем историю
+    session['used_cards'] = []  # Не повторять карточки
     return redirect(url_for('main.game'))
 
 
+# === Игра: показ карточки ===
 @main.route('/game')
 def game():
     if 'players' not in session:
@@ -69,7 +74,7 @@ def game():
     # Фильтр по полу
     allowed_genders = [player['gender'], 'Любой']
 
-    # Все карточки текущего уровня
+    # Все игровые карточки текущего уровня
     available_cards = Card.query.filter(
         Card.level == level,
         Card.card_type == 'game',
@@ -78,6 +83,7 @@ def game():
         Card.target.in_(['Партнёр', 'Любой'])
     ).all()
 
+    # Если нет карточек на уровне — проверим, можно ли перейти
     if not available_cards:
         if level < 4:
             session['level'] += 1
@@ -87,7 +93,7 @@ def game():
             flash('🎉 Все уровни пройдены!', 'success')
             return redirect(url_for('main.players'))
 
-    # Оставляем неиспользованные или повторяемые
+    # Оставляем только неиспользованные или повторяемые
     unused = [c for c in available_cards if c.id not in session['used_cards'] or c.can_repeat]
     if not unused:
         if level < 4:
@@ -98,14 +104,18 @@ def game():
             flash('🎉 Игра завершена!', 'success')
             return redirect(url_for('main.players'))
 
+    # Выбираем случайную
     card = random.choice(unused)
+
+    # Если не повторяется — помечаем как использованную
     if not card.can_repeat:
         session['used_cards'].append(card.id)
-        session.modified = True  # ⚠️ Сессия изменена
+        session.modified = True  # Важно для сессии
 
     return render_template('game.html', card=card, player=player, next=next_player)
 
 
+# === Штрафная карточка ===
 @main.route('/penalty')
 def penalty():
     if 'players' not in session:
@@ -116,13 +126,25 @@ def penalty():
     player = players[current]
     next_player = players[(current + 1) % len(players)]
 
-    card = Card.query.filter_by(level=2, card_type='penalty').order_by(db.func.random()).first()
+    # Берём случайную штрафную карточку
+    card = Card.query.filter_by(card_type='penalty').order_by(db.func.random()).first()
+
+    # Резервная карточка
     if not card:
-        card = Card(text="Ты не справился — поцелуй в шею", level=2, card_type='penalty', orientation='Любая', gender='Любой', target='Любой')
+        card = Card(
+            text="Ты не справился — поцелуй в шею соседа",
+            level=2,
+            card_type='penalty',
+            orientation='Любая',
+            gender='Любой',
+            target='Любой',
+            can_repeat=True
+        )
 
     return render_template('penalty.html', card=card, player=player, next=next_player)
 
 
+# === Следующий игрок ===
 @main.route('/next')
 def next_player():
     if 'players' in session:
@@ -130,11 +152,13 @@ def next_player():
     return redirect(url_for('main.game'))
 
 
+# === Админка: секретный вход ===
 @main.route('/admin-secret')
 def admin_secret():
     return redirect(url_for('main.admin_login', next=url_for('main.admin')))
 
 
+# === Админка: вход ===
 @main.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     next_page = request.args.get('next') or url_for('main.index')
@@ -146,18 +170,26 @@ def admin_login():
             flash('✅ Добро пожаловать!', 'success')
             return redirect(next_page)
         else:
-            flash('❌ Ошибка', 'error')
+            flash('❌ Неверный логин или пароль', 'error')
     return render_template('admin/login.html', next=next_page)
 
 
+# === Админка: главная с вкладками ===
 @main.route('/admin')
 def admin():
     if not session.get('admin_logged_in'):
         return redirect(url_for('main.admin_login'))
-    cards = Card.query.all()
-    return render_template('admin/index.html', cards=cards)
+    
+    # Разделяем карточки
+    game_cards = Card.query.filter_by(card_type='game').all()
+    penalty_cards = Card.query.filter_by(card_type='penalty').all()
+    
+    return render_template('admin/index.html', 
+                         game_cards=game_cards, 
+                         penalty_cards=penalty_cards)
 
 
+# === Админка: выход ===
 @main.route('/admin/logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
@@ -165,28 +197,30 @@ def admin_logout():
     return redirect(url_for('main.index'))
 
 
+# === Добавить карточку ===
 @main.route('/admin/add-card', methods=['POST'])
 def add_card():
     try:
         card = Card(
             text=request.form['text'].strip(),
             level=int(request.form['level']),
-            card_type=request.form['card_type'],
+            card_type=request.form['card_type'],  # 'game' или 'penalty'
             orientation=request.form['orientation'],
             gender=request.form['gender'],
             target=request.form['target'],
             image_url=request.form.get('image_url') or None,
-            can_repeat='can_repeat' in request.form
+            can_repeat='can_repeat' in request.form  # чекбокс
         )
         db.session.add(card)
         db.session.commit()
-        flash('✅ Добавлено', 'success')
+        flash('✅ Карточка добавлена', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'❌ Ошибка: {e}', 'error')
+        flash(f'❌ Ошибка: {str(e)}', 'error')
     return redirect(url_for('main.admin'))
 
 
+# === Редактировать карточку ===
 @main.route('/admin/edit-card/<int:id>', methods=['GET', 'POST'])
 def edit_card(id):
     card = Card.query.get_or_404(id)
@@ -205,10 +239,11 @@ def edit_card(id):
             return redirect(url_for('main.admin'))
         except Exception as e:
             db.session.rollback()
-            flash(f'❌ Ошибка: {e}', 'error')
+            flash(f'❌ Ошибка: {str(e)}', 'error')
     return render_template('admin/edit_card.html', card=card)
 
 
+# === Удалить карточку ===
 @main.route('/admin/delete-card/<int:id>', methods=['POST'])
 def delete_card(id):
     try:
@@ -218,5 +253,5 @@ def delete_card(id):
         flash('🗑️ Удалено', 'info')
     except Exception as e:
         db.session.rollback()
-        flash(f'❌ Ошибка: {e}', 'error')
+        flash(f'❌ Ошибка: {str(e)}', 'error')
     return redirect(url_for('main.admin'))
