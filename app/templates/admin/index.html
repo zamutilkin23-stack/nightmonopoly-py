@@ -41,7 +41,7 @@
     <div class="form">
       <h2>➕ Добавить карточку</h2>
       <form method="POST" action="{{ url_for('main.add_card') }}">
-        <textarea name="text" placeholder="Текст задания (макс. 500 символов)" maxlength="500" required></textarea>
+        <textarea name="text" placeholder="Текст задания (макс. 500)" maxlength="500" required></textarea>
         
         <select name="level" required>
           <option value="">Уровень</option>
@@ -51,7 +51,80 @@
           <option value="4">4 — Красный</option>
         </select>
 
+        <select name="card_type" required>
+          <option value="game">Обычная</option>
+          <option value="penalty">Штрафная</option>
+        </select>
+
         <select name="orientation" required>
+          <option value="">Ориентация</option>
+          <option value="Гетеро">Гетеро</option>
+          <option value="Би">Би</option>
+          <option value="Лесби">Лесби</option>
+          <option value="Другое">Другое</option>
+          <option value="Любая">Любая</option>
+        </select>
+
+        <select name="gender" required>
+          <option value="">Пол</option>
+          <option value="Парень">Парень</option>
+          <option value="Девушка">Девушка</option>
+          <option value="Любой">Любой</option>
+        </select>
+
+        <select name="target" required>
+          <option value="">Цель</option>
+          <option value="Партнёр">Партнёр</option>
+          <option value="Любой">Любой</option>
+        </select>
+
+        <label>
+          <input type="checkbox" name="can_repeat" value="y"> Разрешить повтор
+        </label>
+
+        <input type="text" name="image_url" placeholder="Ссылка на GIF (необязательно)">
+
+        <button type="submit">Добавить карточку</button>
+      </form>
+    </div>
+
+    <h2>🃏 Список карточек ({{ cards|length }})</h2>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Текст</th>
+        <th>Ур.</th>
+        <th>Тип</th>
+        <th>Ориентация</th>
+        <th>Пол</th>
+        <th>Фон</th>
+        <th>Повт.</th>
+        <th>Действия</th>
+      </tr>
+      {% for card in cards %}
+      <tr>
+        <td>{{ card.id }}</td>
+        <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ card.text }}">
+          {{ card.text }}
+        </td>
+        <td>{{ card.level }}</td>
+        <td>{{ card.card_type }}</td>
+        <td>{{ card.orientation }}</td>
+        <td>{{ card.gender }}</td>
+        <td>{% if card.image_url %}✅{% else %}—{% endif %}</td>
+        <td>{% if card.can_repeat %}🔁{% else %}—{% endif %}</td>
+        <td class="actions">
+          <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn">Редакт</a>
+          <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить карточку №{{ card.id }}?');">
+            <button type="submit" class="delete-btn">Удалить</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+</html>        <select name="orientation" required>
           <option value="">Ориентация</option>
           <option value="Гетеро">Гетеро</option>
           <option value="Би">Би</option>

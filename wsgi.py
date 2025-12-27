@@ -10,8 +10,9 @@ app = create_app()
 with app.app_context():
     db.create_all()
 
-    # Инициализация карточек
-    if not Card.query.first():
+    if db.session.query(Card).first():
+        print("✅ База заполнена")
+    else:
         seed_path = os.path.join(app.root_path, '..', 'cards_seed.json')
         if os.path.exists(seed_path):
             with open(seed_path, 'r', encoding='utf-8') as f:
@@ -20,14 +21,18 @@ with app.app_context():
                     card = Card(
                         text=c['text'],
                         level=c['level'],
+                        card_type=c.get('card_type', 'game'),
                         orientation=c['orientation'],
                         gender=c['gender'],
                         target=c['target'],
-                        image_url=c.get('image_url')
+                        image_url=c.get('image_url'),
+                        can_repeat=c.get('can_repeat', False)
                     )
                     db.session.add(card)
                 db.session.commit()
             print("✅ Карточки загружены")
+        else:
+            print("⚠️ Файл cards_seed.json не найден")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
