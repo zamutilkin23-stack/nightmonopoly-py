@@ -1,10 +1,17 @@
-# render.yaml
 services:
   - type: web
     name: nightmonopoly-py
-    region: frankfurt
-    plan: free
     runtime: python
+    env: python
+    region: oregon
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        value: your-super-secret-key-change-it
+      - key: FLASK_ENV
+        value: production
     buildCommand: pip install -r requirements.txt
     startCommand: python wsgi.py
-    env: python
+    disk:
+      name: nightmonopoly-data
+      mountPath: /opt/render/project/src/data

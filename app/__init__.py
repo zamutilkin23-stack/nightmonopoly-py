@@ -5,21 +5,15 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    
-    # Секретный ключ
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-night-2024')
 
-    # Подключение к базе
-    database_url = os.getenv('DATABASE_URL', 'sqlite:///night.db')
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    # Путь к базе на Persistent Disk
+    db_path = os.path.join('/opt/render/project/src/data', 'nightmonopoly.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Инициализация БД
     db.init_app(app)
 
-    # Регистрация Blueprint
     from .routes import main
     app.register_blueprint(main)
 

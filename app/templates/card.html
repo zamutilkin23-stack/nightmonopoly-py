@@ -1,25 +1,84 @@
-<!-- templates/card.html -->
+<!-- app/templates/card.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>Карточка</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Карточка — NightMonopoly</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px; }
-    .card { border: 2px solid #000; padding: 20px; max-width: 400px; margin: 20px auto; }
-    .error { color: red; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background: #000;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    .card {
+      background: #1a1a1a;
+      border: 3px solid #e74c3c;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 500px;
+      margin: 20px auto;
+      box-shadow: 0 0 20px rgba(231, 76, 60, 0.5);
+    }
+    .level {
+      color: #f39c12;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .text {
+      font-size: 1.4em;
+      margin: 20px 0;
+      line-height: 1.5;
+    }
+    .meta {
+      font-size: 0.9em;
+      color: #bdc3c7;
+      margin-top: 20px;
+    }
+    .image {
+      margin: 20px auto;
+      max-width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+    .back {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 12px 25px;
+      background: #e74c3c;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+    }
+    .error {
+      color: #e74c3c;
+      font-size: 1.2em;
+    }
   </style>
 </head>
 <body>
-  {% if error %}
-    <div class="error"><h2>{{ error }}</h2></div>
-  {% else %}
-    <div class="card">
-      <h2>Уровень {{ card.level }}</h2>
-      <p>{{ card.text }}</p>
-      <p><small>{{ card.orientation }} | {{ card.gender_combo }} | {{ card.target }}</small></p>
-    </div>
-  {% endif %}
-  <a href="/">← Назад</a>
+  <div class="card">
+    {% if error %}
+      <div class="error">
+        <h2>❌ {{ error }}</h2>
+      </div>
+    {% else %}
+      <div class="level">Уровень {{ card.level }}</div>
+      <div class="text">{{ card.text }}</div>
+      {% if card.image_url %}
+        <div class="image">
+          <img src="{{ card.image_url }}" alt="GIF" onerror="this.src='https://via.placeholder.com/300x200?text=GIF+не+загрузился'; this.style.opacity='0.5';">
+        </div>
+      {% endif %}
+      <div class="meta">
+        {{ card.orientation }} | {{ card.gender_combo }} | {{ card.target }}
+      </div>
+    {% endif %}
+  </div>
+
+  <a href="/" class="back">← Назад</a>
 </body>
 </html>
