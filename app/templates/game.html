@@ -1,11 +1,16 @@
-<!-- templates/game.html -->
 <!DOCTYPE html>
 <html>
 <head>
   <title>Игра</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: 'Arial'; text-align: center; padding: 40px; background: #000; color: #fff; }
+    body {
+      font-family: 'Arial';
+      text-align: center;
+      padding: 40px 20px 80px;
+      background: #000;
+      color: #fff;
+    }
     .card {
       border: 4px solid;
       border-color: 
@@ -16,21 +21,50 @@
       margin: 20px auto;
       background: #111;
     }
-    .text { font-size: 1.4em; margin: 20px 0; }
-    .player { color: #e74c3c; font-size: 1.2em; }
-    .btn { padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; }
+    .text { font-size: 1.4em; margin: 20px 0; line-height: 1.5; }
+    .player { color: #e74c3c; font-size: 1.2em; margin: 10px 0; }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #e74c3c;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+    }
+    .admin-link {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      color: #333;
+      font-size: 24px;
+      text-decoration: none;
+      opacity: 0.1;
+      transition: opacity 0.3s, color 0.3s;
+      z-index: 1000;
+    }
+    .admin-link:hover {
+      opacity: 0.5;
+      color: #e74c3c;
+    }
+    .admin-link:active {
+      opacity: 1;
+      color: #e74c3c;
+    }
   </style>
 </head>
 <body>
-  <p><strong>Сейчас ходит:</strong> {{ player.name }} ({{ player.gender }})</p>
+  <p><strong>Сейчас ходит:</strong> {{ player.name }}</p>
 
   <div class="card">
-    <div class="level">Уровень {{ card.level }}</div>
     <div class="text">{{ card.text }}</div>
   </div>
 
   <p><strong>Следующий:</strong> {{ next.name }}</p>
 
   <a href="/next" class="btn">Следующий игрок →</a>
+
+  <!-- Скрытый вход в админку -->
+  <a href="/admin-secret" class="admin-link" title="Вход в админку">...</a>
 </body>
 </html>

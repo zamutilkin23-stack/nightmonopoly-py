@@ -1,4 +1,4 @@
-        # app/routes.py
+# app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from .extensions import db
 from .models import Card
@@ -18,7 +18,6 @@ def index():
 def players():
     if request.method == 'POST':
         players = []
-
         for i in range(1, 5):
             name = request.form.get(f'name{i}')
             if not name:
@@ -37,9 +36,9 @@ def players():
 
         session['players'] = players
         session['current'] = 0
-        return redirect(url_for('main.game'))  # Уходим в игру
+        return redirect(url_for('main.game'))
 
-    return render_template('players.html')  # GET — просто показ
+    return render_template('players.html')
 
 
 # === Игра: показ карточки ===
@@ -81,21 +80,25 @@ def next_player():
     return redirect(url_for('main.game'))
 
 
-# === Тайный вход в админку ===
+# === Тайный вход: троеточие → сюда ===
 @main.route('/admin-secret')
 def admin_secret():
-    return redirect(url_for('main.admin_login'))
+    return redirect(url_for('main.admin_login', next=url_for('main.admin')))
 
 
-# === Админка: вход ===
+# === Админка: вход с возвратом ===
 @main.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    next_page = request.args.get('next') or url_for('main.index')
+
     if request.method == 'POST':
         if request.form['username'] == 'Vladimirovich' and request.form['password'] == 'Timur':
             session['admin_logged_in'] = True
-            return redirect(url_for('main.admin'))
-        flash('Неверный логин или пароль', 'error')
-    return render_template('admin/login.html')
+            flash('✅ Добро пожеловать, командир', 'success')
+            return redirect(next_page)
+        flash('❌ Неверный логин или пароль', 'error')
+
+    return render_template('admin/login.html', next=next_page)
 
 
 # === Админка: главная ===
