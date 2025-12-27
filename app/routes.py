@@ -1,15 +1,11 @@
 # app/routes.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-from .extensions import db
-from .models import Card
+from flask import Blueprint
 
-main = Blueprint('main', __name__)
+main = Blueprint('main', __name__)  # ✅ Имя и атрибут
 
-
-# === Главная: проверка 18+ ===
 @main.route('/')
 def index():
-    return render_template('index.html')
+    return "Добро пожаловать на NightFanta!"  # Для теста
 
 
 # === Тест админки ===
