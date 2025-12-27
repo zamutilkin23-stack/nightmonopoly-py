@@ -1,22 +1,38 @@
 <!-- templates/game.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Игра</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px 20px; background: #000; color: #fff; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
     .card {
       border: 4px solid;
       border-color: 
         {% if card.level == 1 %}#fff{% elif card.level == 2 %}#ffeb3b{% elif card.level == 3 %}#9c27b0{% else %}#f44336{% endif %};
       border-radius: 15px;
-      padding: 30px;
-      max-width: 500px;
-      margin: 30px auto;
+      padding: 25px 20px;
+      max-width: 400px;
+      margin: 20px auto;
       background: #111;
       position: relative;
       overflow: hidden;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .background {
       position: absolute;
@@ -25,23 +41,70 @@
       opacity: 0.15;
       z-index: 0;
     }
-    .text { position: relative; z-index: 1; font-size: 1.4em; line-height: 1.5; }
-    .target { font-size: 1.2em; color: #3498db; margin: 10px 0; }
+    .text {
+      position: relative;
+      z-index: 1;
+      font-size: 1.3em;
+      line-height: 1.5;
+      color: #fff;
+    }
+    .target {
+      font-size: 1.2em;
+      color: #3498db;
+      margin: 10px 0;
+    }
+    .info {
+      font-size: 0.95em;
+      color: #aaa;
+      margin: 10px 0;
+    }
     .btn {
+      display: inline-block;
       padding: 12px 24px;
       background: #e74c3c;
       color: white;
       text-decoration: none;
       border-radius: 30px;
-      margin: 8px;
+      margin: 8px 5px;
+      font-size: 1em;
+      min-width: 130px;
     }
-    .choice-btn { background: #3498db; }
-    .target-select { margin: 20px 0; font-size: 1.2em; }
-    select { padding: 10px; font-size: 1em; border-radius: 5px; background: #333; color: #fff; }
+    .penalty-btn {
+      background: #3498db;
+    }
+    .target-select {
+      margin: 15px 0;
+      font-size: 1em;
+    }
+    select {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      font-size: 1em;
+    }
+    option { background: #333; color: #fff; }
+    .admin-link {
+      position: fixed;
+      left: 15px;
+      bottom: 15px;
+      color: #333;
+      font-size: 24px;
+      opacity: 0.1;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .admin-link:hover, .admin-link:active {
+      opacity: 1;
+      color: #e74c3c;
+    }
   </style>
 </head>
 <body>
-  <p><strong>Сейчас ходит:</strong> {{ player.name }}</p>
+  <p class="info"><strong>Сейчас ходит:</strong> {{ player.name }}</p>
 
   <div class="card">
     {% if card.image_url %}
@@ -60,16 +123,18 @@
               <option value="{{ p.name }}">{{ p.name }}</option>
             {% endfor %}
           </select>
-          <button type="submit" class="btn">Выбрать</button>
+          <button type="submit" class="btn" style="background:#3498db">Выбрать</button>
         </form>
       </div>
     {% endif %}
   </div>
 
   {% if card.target != 'Партнёр на выбор' or selected_target %}
-    <p><strong>Следующий:</strong> {{ next.name }}</p>
-    <a href="/next" class="btn">Выполнено →</a>
-    <a href="/penalty" class="btn choice-btn">Не выполнено →</a>
+    <p class="info"><strong>Следующий:</strong> {{ next.name }}</p>
+    <div>
+      <a href="/next" class="btn">Выполнено →</a>
+      <a href="/penalty" class="btn penalty-btn">Не выполнено →</a>
+    </div>
   {% endif %}
 
   <a href="/admin-secret" class="admin-link">...</a>

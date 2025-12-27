@@ -1,17 +1,77 @@
 <!-- templates/index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NightFanta</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px 20px; background: #000; color: #fff; }
-    .btn { padding: 15px 30px; background: #e74c3c; color: white; text-decoration: none; border-radius: 30px; margin: 10px; font-size: 18px; }
-    .logo { font-size: 28px; color: #e74c3c; margin-bottom: 20px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .logo {
+      font-size: 2.8em;
+      color: #e74c3c;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    }
+    .warning {
+      font-size: 1.1em;
+      color: #ddd;
+      margin: 15px auto;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: #e74c3c;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-size: 1.2em;
+      margin: 15px;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #c0392b;
+      transform: scale(1.05);
+    }
+    .admin-link {
+      position: fixed;
+      left: 15px;
+      bottom: 15px;
+      color: #333;
+      font-size: 24px;
+      opacity: 0.1;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .admin-link:hover, .admin-link:active {
+      opacity: 1;
+      color: #e74c3c;
+    }
   </style>
 </head>
 <body>
-  <h1 class="logo">🔥 NightFanta</h1>
+  <h1 class="logo">🔥 Ночные забавы</h1>
+  <p class="warning">
+    Это приложение содержит контент для взрослых.<br>
+    Вход разрешён только лицам от 18 лет.
+  </p>
   <a href="/players" class="btn">Начать игру</a>
+
+  <a href="/admin-secret" class="admin-link">...</a>
 </body>
 </html>
