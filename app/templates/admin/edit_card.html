@@ -1,24 +1,61 @@
+<!-- templates/admin/edit_card.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Редактировать карточку</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; padding: 20px; background: #121212; color: #fff; }
-    .container { max-width: 700px; margin: 0 auto; }
-    h1 { color: #e74c3c; }
-    .form { background: #1e1e1e; padding: 20px; border-radius: 10px; }
-    input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #444; border-radius: 5px; background: #333; color: white; }
-    textarea { height: 120px; resize: vertical; }
-    button { background: #e74c3c; color: white; padding: 12px 20px; border: none; border-radius: 6px; }
-    .back { color: #888; text-decoration: none; }
-    label { display: block; margin: 10px 0 5px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #121212;
+      color: #eee;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    h1 {
+      color: #e74c3c;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #333;
+      color: #fff;
+    }
+    textarea { height: 100px; resize: vertical; }
+    label { display: block; margin: 15px 0 5px; }
+    button {
+      background: #e74c3c;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .back {
+      color: #888;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>✏️ Редактировать №{{ card.id }}</h1>
-
     <form method="POST">
       <textarea name="text" maxlength="500" required>{{ card.text }}</textarea>
 
@@ -63,8 +100,6 @@
 
       <button type="submit">Сохранить</button>
     </form>
-
-    <br>
     <a href="{{ url_for('main.admin') }}" class="back">← Назад к списку</a>
   </div>
 </body>

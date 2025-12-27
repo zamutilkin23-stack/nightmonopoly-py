@@ -1,60 +1,133 @@
+<!-- templates/admin/index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Админка — NightFanta</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; padding: 10px; background: #121212; color: #eee; font-size: 13px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #121212;
+      color: #eee;
+      padding: 15px;
+      font-size: 14px;
+    }
     .container { max-width: 900px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    h1 { color: #e74c3c; margin: 0; font-size: 1.5em; }
-    .logout { color: #aaa; text-decoration: none; font-size: 14px; }
-    .flash { padding: 8px; margin: 10px 0; border-radius: 4px; font-size: 13px; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    h1 { color: #e74c3c; font-size: 1.6em; }
+    .logout {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 15px;
+    }
+    .flash {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      font-size: 14px;
+      text-align: center;
+    }
     .success { background: #27ae60; color: white; }
     .error { background: #c0392b; color: white; }
-    .filters { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
-    .filter-btn { padding: 8px 12px; background: #333; color: #ddd; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
-    .filter-btn.active { background: #e74c3c; color: white; }
-    .form { background: #1e1e1e; padding: 12px; border-radius: 6px; margin: 10px 0; }
-    input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #444; border-radius: 4px; background: #333; color: #fff; font-size: 13px; }
-    textarea { height: 70px; resize: vertical; }
-    button { background: #e74c3c; color: white; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
-    table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; }
-    th { background: #2c2c2c; color: #ddd; padding: 6px; text-align: left; }
-    td { padding: 6px; border-bottom: 1px solid #333; color: #eee; }
-    .actions { display: flex; gap: 6px; }
-    .btn { color: #e74c3c; text-decoration: none; font-size: 13px; }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 10px 18px;
+      background: #333;
+      color: #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .tab.active { background: #e74c3c; color: white; }
+    .form {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #333;
+      color: #fff;
+    }
+    textarea { height: 80px; resize: vertical; }
+    button {
+      background: #e74c3c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 13px;
+    }
+    th {
+      background: #2c2c2c;
+      color: #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #333;
+      color: #eee;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      justify-content: start;
+    }
+    .btn {
+      color: #e74c3c;
+      text-decoration: none;
+      font-size: 13px;
+    }
     .btn:hover { text-decoration: underline; }
-    .delete-btn { background: #c0392b; padding: 4px 8px; }
-    .id { width: 30px; color: #888; }
-    .text-col { max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .level, .orient, .gender, .target, .repeat { width: 50px; text-align: center; }
+    .delete-btn {
+      background: #c0392b;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .id { width: 40px; color: #888; }
+    .text-col {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .level, .orient, .target, .repeat { width: 50px; text-align: center; }
   </style>
   <script>
-    function filterCards(filter, type) {
-      document.querySelectorAll('.card-row').forEach(row => {
-        const gameType = row.dataset.game || '';
-        const orientation = row.dataset.orient || '';
-        const show = (!filter || gameType.includes(filter)) && (!type || orientation === type);
-        row.style.display = show ? '' : 'none';
-      });
-
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById('btn-' + (filter || type)).classList.add('active');
-    }
-
     function showTab(tab) {
       document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.getElementById('tab-' + tab).classList.add('active');
       document.getElementById('content-' + tab).style.display = 'block';
-      filterCards('', '');
-    }
-
-    function resetFilters() {
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById('btn-all').classList.add('active');
-      document.querySelectorAll('.card-row').forEach(row => row.style.display = '');
     }
   </script>
 </head>
@@ -76,18 +149,19 @@
       <div class="tab" id="tab-penalty" onclick="showTab('penalty')">⚡ Штрафные</div>
     </div>
 
-    <!-- Игровые -->
+    <!-- ИГРОВЫЕ КАРТОЧКИ -->
     <div id="content-game" class="tab-content" style="display:block;">
       <div class="form">
+        <h3>➕ Добавить игровую карточку</h3>
         <form method="POST" action="{{ url_for('main.add_card') }}">
           <input type="hidden" name="card_type" value="game">
           <textarea name="text" placeholder="Текст задания (макс. 500)" maxlength="500" required></textarea>
           <select name="level" required>
-            <option value="">Ур.</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
+            <option value="">Уровень</option>
+            <option value="1">1 — Белый</option>
+            <option value="2">2 — Жёлтый</option>
+            <option value="3">3 — Фиолетовый</option>
+            <option value="4">4 — Красный</option>
           </select>
           <select name="orientation" required>
             <option value="">Ориентация</option>
@@ -109,24 +183,13 @@
             <option value="Любой">Любой</option>
             <option value="Партнёр на выбор">Партнёр на выбор</option>
           </select>
-          <label><input type="checkbox" name="can_repeat" value="y"> Повтор</label>
-          <input type="text" name="image_url" placeholder="Ссылка на GIF (необяз.)">
+          <label><input type="checkbox" name="can_repeat" value="y"> Разрешить повтор</label>
+          <input type="text" name="image_url" placeholder="Ссылка на GIF (необязательно)">
           <button type="submit">Добавить</button>
         </form>
       </div>
 
-      <div class="filters">
-        <button id="btn-all" class="filter-btn active" onclick="resetFilters()">Все</button>
-        <button id="btn-MJ" class="filter-btn" onclick="filterCards('MJ', '')">МЖ</button>
-        <button id="btn-JMJ" class="filter-btn" onclick="filterCards('JMJ', '')">ЖМЖ</button>
-        <button id="btn-MJM" class="filter-btn" onclick="filterCards('MJM', '')">МЖМ</button>
-        <button id="btn-MJMJ" class="filter-btn" onclick="filterCards('MJMJ', '')">МЖМЖ</button>
-        <button id="btn-G" class="filter-btn" onclick="filterCards('', 'Гетеро')">Гетеро</button>
-        <button id="btn-Bi" class="filter-btn" onclick="filterCards('', 'Би')">Би</button>
-        <button id="btn-L" class="filter-btn" onclick="filterCards('', 'Лесби')">Лесби</button>
-        <button id="btn-D" class="filter-btn" onclick="filterCards('', 'Другое')">Другое</button>
-      </div>
-
+      <h3>🃏 Игровые карточки ({{ game_cards|length }})</h3>
       <table>
         <tr>
           <th>ID</th>
@@ -138,9 +201,7 @@
           <th>Действия</th>
         </tr>
         {% for card in game_cards %}
-        <tr class="card-row" 
-            data-game="{% if 'Парень' in card.gender and 'Девушка' in card.target %}MJ{% elif 'Девушка' in card.gender and 'Парень' in card.target %}JMJ{% elif 'Гетеро' in card.orientation %}MJM{% else %}MJMJ{% endif %}" 
-            data-orient="{{ card.orientation }}">
+        <tr>
           <td class="id">{{ card.id }}</td>
           <td class="text-col" title="{{ card.text }}">{{ card.text }}</td>
           <td class="level">{{ card.level }}</td>
@@ -149,7 +210,7 @@
           <td class="repeat">{% if card.can_repeat %}🔁{% endif %}</td>
           <td class="actions">
             <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn">Ред</a>
-            <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить?')">
+            <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить карточку №{{ card.id }}?');">
               <button type="submit" class="delete-btn">Удалить</button>
             </form>
           </td>
@@ -158,13 +219,14 @@
       </table>
     </div>
 
-    <!-- Штрафные -->
+    <!-- ШТРАФНЫЕ КАРТОЧКИ -->
     <div id="content-penalty" class="tab-content" style="display:none;">
       <div class="form">
+        <h3>➕ Добавить штрафную карточку</h3>
         <form method="POST" action="{{ url_for('main.add_card') }}">
           <input type="hidden" name="card_type" value="penalty">
           <input type="hidden" name="level" value="2">
-          <textarea name="text" placeholder="Текст штрафа" maxlength="500" required></textarea>
+          <textarea name="text" placeholder="Текст штрафа (макс. 500)" maxlength="500" required></textarea>
           <select name="orientation" required>
             <option value="">Ориентация</option>
             <option value="Гетеро">Гетеро</option>
@@ -185,27 +247,13 @@
             <option value="Любой">Любой</option>
             <option value="Партнёр на выбор">Партнёр на выбор</option>
           </select>
-          <label><input type="checkbox" name="can_repeat" value="y" checked> Повтор</label>
-          <input type="text" name="image_url" placeholder="Ссылка на GIF (необяз.)">
+          <label><input type="checkbox" name="can_repeat" value="y" checked> Разрешить повтор</label>
+          <input type="text" name="image_url" placeholder="Ссылка на GIF (необязательно)">
           <button type="submit">Добавить штраф</button>
         </form>
       </div>
 
-      <div class="filters">
-        <button class="filter-btn active" onclick="document.querySelectorAll('.p-row').forEach(r => r.style.display='');">Все</button>
-        <button class="filter-btn" onclick="filterPenalty('Гетеро')">Гетеро</button>
-        <button class="filter-btn" onclick="filterPenalty('Би')">Би</button>
-        <button class="filter-btn" onclick="filterPenalty('Лесби')">Лесби</button>
-        <button class="filter-btn" onclick="filterPenalty('Другое')">Другое</button>
-      </div>
-      <script>
-        function filterPenalty(type) {
-          document.querySelectorAll('.p-row').forEach(row => {
-            row.style.display = type === '' || row.dataset.orient === type ? '' : 'none';
-          });
-        }
-      </script>
-
+      <h3>⚡ Штрафные карточки ({{ penalty_cards|length }})</h3>
       <table>
         <tr>
           <th>ID</th>
@@ -216,7 +264,7 @@
           <th>Действия</th>
         </tr>
         {% for card in penalty_cards %}
-        <tr class="p-row" data-orient="{{ card.orientation }}">
+        <tr>
           <td class="id">{{ card.id }}</td>
           <td class="text-col" title="{{ card.text }}">{{ card.text }}</td>
           <td class="orient">{{ card.orientation }}</td>
@@ -224,7 +272,7 @@
           <td class="repeat">{% if card.can_repeat %}🔁{% endif %}</td>
           <td class="actions">
             <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn">Ред</a>
-            <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить?')">
+            <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить штраф №{{ card.id }}?');">
               <button type="submit" class="delete-btn">Удалить</button>
             </form>
           </td>

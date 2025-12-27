@@ -197,8 +197,9 @@ def admin():
         return redirect(url_for('main.admin_login'))
     game_cards = Card.query.filter_by(card_type='game').all()
     penalty_cards = Card.query.filter_by(card_type='penalty').all()
-    return render_template('admin/index.html', game_cards=game_cards, penalty_cards=penalty_cards)
-
+    return render_template('admin/index.html', 
+                         game_cards=game_cards, 
+                         penalty_cards=penalty_cards)
 
 @main.route('/admin/logout')
 def admin_logout():
