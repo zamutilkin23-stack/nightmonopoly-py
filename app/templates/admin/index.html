@@ -1,34 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Админка — NightFanta</title>
+  <title>Админка</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; padding: 20px; background: #121212; color: #fff; }
+    body { font-family: Arial; padding: 10px; background: #121212; color: #eee; font-size: 14px; }
     .container { max-width: 900px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    h1 { color: #e74c3c; }
-    .logout { color: #aaa; text-decoration: underline; font-size: 16px; }
-    .flash { padding: 10px; margin: 10px 0; border-radius: 5px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    h1 { color: #e74c3c; margin: 0; font-size: 1.5em; }
+    .logout { color: #aaa; text-decoration: none; font-size: 16px; }
+    .flash { padding: 8px; margin: 10px 0; border-radius: 4px; font-size: 14px; }
     .success { background: #27ae60; color: white; }
-    .info { background: #3498db; color: white; }
-    .form { background: #1e1e1e; padding: 20px; border-radius: 10px; margin: 20px 0; }
-    input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #444; border-radius: 5px; background: #333; color: white; }
-    textarea { height: 100px; resize: vertical; }
-    button { background: #e74c3c; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
-    th { background: #2c2c2c; color: #ddd; }
-    .actions { display: flex; gap: 10px; }
-    .btn { color: #e74c3c; text-decoration: none; }
+    .error { background: #c0392b; color: white; }
+    .tabs { display: flex; gap: 5px; margin: 15px 0; }
+    .tab { padding: 10px 15px; background: #333; color: #ddd; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .tab.active { background: #e74c3c; color: white; }
+    .form { background: #1e1e1e; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #444; border-radius: 4px; background: #333; color: #fff; font-size: 14px; }
+    textarea { height: 80px; resize: vertical; }
+    button { background: #e74c3c; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px; }
+    th { background: #2c2c2c; color: #ddd; padding: 8px; text-align: left; }
+    td { padding: 8px; border-bottom: 1px solid #333; color: #eee; }
+    .actions { display: flex; gap: 8px; }
+    .btn { color: #e74c3c; text-decoration: none; font-size: 14px; }
     .btn:hover { text-decoration: underline; }
-    .delete-btn { background: #c0392b; }
+    .delete-btn { background: #c0392b; padding: 6px 10px; }
+    .back { color: #888; text-decoration: none; font-size: 14px; }
+    .id { width: 40px; color: #888; }
+    .level { width: 40px; text-align: center; }
+    .repeat { width: 60px; text-align: center; }
+    .text-col { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   </style>
+  <script>
+    function showTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('content-' + tab).style.display = 'block';
+    }
+  </script>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🔐 Админка NightFanta</h1>
+      <h1>🔐 Админка</h1>
       <a href="{{ url_for('main.admin_logout') }}" class="logout">Выход</a>
     </div>
 
@@ -38,150 +54,96 @@
       {% endfor %}
     {% endwith %}
 
-    <div class="form">
-      <h2>➕ Добавить карточку</h2>
-      <form method="POST" action="{{ url_for('main.add_card') }}">
-        <textarea name="text" placeholder="Текст задания (макс. 500)" maxlength="500" required></textarea>
-        
-        <select name="level" required>
-          <option value="">Уровень</option>
-          <option value="1">1 — Белый</option>
-          <option value="2">2 — Жёлтый</option>
-          <option value="3">3 — Фиолетовый</option>
-          <option value="4">4 — Красный</option>
-        </select>
-
-        <select name="card_type" required>
-          <option value="game">Обычная</option>
-          <option value="penalty">Штрафная</option>
-        </select>
-
-        <select name="orientation" required>
-          <option value="">Ориентация</option>
-          <option value="Гетеро">Гетеро</option>
-          <option value="Би">Би</option>
-          <option value="Лесби">Лесби</option>
-          <option value="Другое">Другое</option>
-          <option value="Любая">Любая</option>
-        </select>
-
-        <select name="gender" required>
-          <option value="">Пол</option>
-          <option value="Парень">Парень</option>
-          <option value="Девушка">Девушка</option>
-          <option value="Любой">Любой</option>
-        </select>
-
-        <select name="target" required>
-          <option value="">Цель</option>
-          <option value="Партнёр">Партнёр</option>
-          <option value="Любой">Любой</option>
-        </select>
-
-        <label>
-          <input type="checkbox" name="can_repeat" value="y"> Разрешить повтор
-        </label>
-
-        <input type="text" name="image_url" placeholder="Ссылка на GIF (необязательно)">
-
-        <button type="submit">Добавить карточку</button>
-      </form>
+    <div class="tabs">
+      <div class="tab active" id="tab-game" onclick="showTab('game')">🎮 Игровые</div>
+      <div class="tab" id="tab-penalty" onclick="showTab('penalty')">⚡ Штрафные</div>
     </div>
 
-    <h2>🃏 Список карточек ({{ cards|length }})</h2>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Текст</th>
-        <th>Ур.</th>
-        <th>Тип</th>
-        <th>Ориентация</th>
-        <th>Пол</th>
-        <th>Фон</th>
-        <th>Повт.</th>
-        <th>Действия</th>
-      </tr>
-      {% for card in cards %}
-      <tr>
-        <td>{{ card.id }}</td>
-        <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ card.text }}">
-          {{ card.text }}
-        </td>
-        <td>{{ card.level }}</td>
-        <td>{{ card.card_type }}</td>
-        <td>{{ card.orientation }}</td>
-        <td>{{ card.gender }}</td>
-        <td>{% if card.image_url %}✅{% else %}—{% endif %}</td>
-        <td>{% if card.can_repeat %}🔁{% else %}—{% endif %}</td>
-        <td class="actions">
-          <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn">Редакт</a>
-          <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить карточку №{{ card.id }}?');">
-            <button type="submit" class="delete-btn">Удалить</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-</body>
-</html>        <select name="orientation" required>
-          <option value="">Ориентация</option>
-          <option value="Гетеро">Гетеро</option>
-          <option value="Би">Би</option>
-          <option value="Лесби">Лесби</option>
-          <option value="Другое">Другое</option>
-          <option value="Любая">Любая</option>
-        </select>
+    <!-- Игровые -->
+    <div id="content-game" class="tab-content" style="display:block;">
+      <div class="form">
+        <form method="POST" action="{{ url_for('main.add_card') }}">
+          <input type="hidden" name="card_type" value="game">
+          <textarea name="text" placeholder="Текст задания" maxlength="500" required></textarea>
+          <select name="level" required>
+            <option value="">Ур.</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+          <select name="orientation" required><option>Любая</option><option>Гетеро</option><option>Би</option><option>Лесби</option><option>Другое</option></select>
+          <select name="gender" required><option>Любой</option><option>Парень</option><option>Девушка</option></select>
+          <select name="target" required><option>Любой</option><option>Партнёр</option></select>
+          <label><input type="checkbox" name="can_repeat" value="y"> Повтор</label>
+          <input type="text" name="image_url" placeholder="GIF (необяз.)">
+          <button type="submit">Добавить</button>
+        </form>
+      </div>
 
-        <select name="gender" required>
-          <option value="">Пол</option>
-          <option value="Парень">Парень</option>
-          <option value="Девушка">Девушка</option>
-          <option value="Любой">Любой</option>
-        </select>
-
-        <select name="target" required>
-          <option value="">Цель</option>
-          <option value="Партнёр">Партнёр</option>
-          <option value="Любой">Любой</option>
-        </select>
-
-        <input type="text" name="image_url" placeholder="Ссылка на GIF/изображение (необязательно)">
-
-        <button type="submit">Добавить карточку</button>
-      </form>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Текст</th>
+          <th>Ур.</th>
+          <th>Повт.</th>
+          <th>Действия</th>
+        </tr>
+        {% for card in game_cards %}
+        <tr>
+          <td class="id">{{ card.id }}</td>
+          <td class="text-col" title="{{ card.text }}">{{ card.text }}</td>
+          <td class="level">{{ card.level }}</td>
+          <td class="repeat">{% if card.can_repeat %}🔁{% endif %}</td>
+          <td class="actions">
+            <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn">Ред</a>
+            <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить?')">
+              <button type="submit" class="delete-btn">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
 
-    <h2>🃏 Список карточек ({{ cards|length }})</h2>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Текст</th>
-        <th>Ур.</th>
-        <th>Ориентация</th>
-        <th>Пол</th>
-        <th>Фон</th>
-        <th>Действия</th>
-      </tr>
-      {% for card in cards %}
-      <tr>
-        <td>{{ card.id }}</td>
-        <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ card.text }}">
-          {{ card.text }}
-        </td>
-        <td>{{ card.level }}</td>
-        <td>{{ card.orientation }}</td>
-        <td>{{ card.gender }}</td>
-        <td>{% if card.image_url %}✅{% else %}—{% endif %}</td>
-        <td class="actions">
-          <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn">Редакт</a>
-          <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить карточку №{{ card.id }}?');">
-            <button type="submit" class="delete-btn">Удалить</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
+    <!-- Штрафные -->
+    <div id="content-penalty" class="tab-content" style="display:none;">
+      <div class="form">
+        <form method="POST" action="{{ url_for('main.add_card') }}">
+          <input type="hidden" name="card_type" value="penalty">
+          <input type="hidden" name="level" value="2">
+          <textarea name="text" placeholder="Текст штрафа" maxlength="500" required></textarea>
+          <select name="orientation" required><option>Любая</option><option>Гетеро</option><option>Би</option><option>Лесби</option><option>Другое</option></select>
+          <select name="gender" required><option>Любой</option><option>Парень</option><option>Девушка</option></select>
+          <select name="target" required><option>Любой</option><option>Партнёр</option></select>
+          <label><input type="checkbox" name="can_repeat" value="y" checked> Повтор</label>
+          <input type="text" name="image_url" placeholder="GIF (необяз.)">
+          <button type="submit">Добавить штраф</button>
+        </form>
+      </div>
+
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Текст</th>
+          <th>Повт.</th>
+          <th>Действия</th>
+        </tr>
+        {% for card in penalty_cards %}
+        <tr>
+          <td class="id">{{ card.id }}</td>
+          <td class="text-col" title="{{ card.text }}">{{ card.text }}</td>
+          <td class="repeat">{% if card.can_repeat %}🔁{% endif %}</td>
+          <td class="actions">
+            <a href="{{ url_for('main.edit_card', id=card.id) }}" class="btn">Ред</a>
+            <form method="POST" action="{{ url_for('main.delete_card', id=card.id) }}" onsubmit="return confirm('Удалить?')">
+              <button type="submit" class="delete-btn">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
   </div>
 </body>
 </html>
