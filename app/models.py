@@ -1,3 +1,4 @@
+# app/models.py
 from .extensions import db
 
 class Card(db.Model):
@@ -7,4 +8,4 @@ class Card(db.Model):
     orientation = db.Column(db.String(20), nullable=False)  # Гетеро, Би, Лесби, Другое, Любая
     gender = db.Column(db.String(20), nullable=False)      # Парень, Девушка, Любой
     target = db.Column(db.String(20), nullable=False)      # Партнёр, Любой
-    image_url = db.Column(db.String(300), nullable=True)
+    image_url = db.Column(db.String(300), nullable=True)   # Ссылка на фон

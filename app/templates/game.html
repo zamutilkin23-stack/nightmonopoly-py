@@ -4,13 +4,7 @@
   <title>Игра</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: 'Arial';
-      text-align: center;
-      padding: 40px 20px 80px;
-      background: #000;
-      color: #fff;
-    }
+    body { font-family: Arial; text-align: center; padding: 40px 20px; background: #000; color: #fff; }
     .card {
       border: 4px solid;
       border-color: 
@@ -18,53 +12,53 @@
       border-radius: 15px;
       padding: 30px;
       max-width: 500px;
-      margin: 20px auto;
+      margin: 30px auto;
       background: #111;
+      position: relative;
+      overflow: hidden;
     }
-    .text { font-size: 1.4em; margin: 20px 0; line-height: 1.5; }
-    .player { color: #e74c3c; font-size: 1.2em; margin: 10px 0; }
+    .background {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: url('{{ card.image_url }}');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .text {
+      position: relative;
+      z-index: 1;
+      font-size: 1.4em;
+      line-height: 1.5;
+    }
     .btn {
-      display: inline-block;
       padding: 12px 24px;
       background: #e74c3c;
       color: white;
       text-decoration: none;
       border-radius: 30px;
-      font-weight: bold;
     }
     .admin-link {
-      position: fixed;
-      left: 20px;
-      bottom: 20px;
-      color: #333;
-      font-size: 24px;
-      text-decoration: none;
-      opacity: 0.1;
-      transition: opacity 0.3s, color 0.3s;
-      z-index: 1000;
+      position: fixed; left: 20px; bottom: 20px; color: #333; font-size: 24px; opacity: 0.1; z-index: 1000;
     }
-    .admin-link:hover {
-      opacity: 0.5;
-      color: #e74c3c;
-    }
-    .admin-link:active {
-      opacity: 1;
-      color: #e74c3c;
-    }
+    .admin-link:hover, .admin-link:active { opacity: 1; color: #e74c3c; }
   </style>
 </head>
 <body>
   <p><strong>Сейчас ходит:</strong> {{ player.name }}</p>
 
   <div class="card">
+    {% if card.image_url %}
+      <div class="background"></div>
+    {% endif %}
     <div class="text">{{ card.text }}</div>
   </div>
 
   <p><strong>Следующий:</strong> {{ next.name }}</p>
 
   <a href="/next" class="btn">Следующий игрок →</a>
-
-  <!-- Скрытый вход в админку -->
-  <a href="/admin-secret" class="admin-link" title="Вход в админку">...</a>
+  <a href="/admin-secret" class="admin-link">...</a>
 </body>
 </html>
