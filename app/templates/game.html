@@ -20,18 +20,20 @@
     .background {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-image: url('{{ card.image_url }}');
-      background-size: cover;
-      background-position: center;
+      background: url('{{ card.image_url }}') center/cover;
       opacity: 0.15;
       z-index: 0;
-      pointer-events: none;
     }
     .text {
       position: relative;
       z-index: 1;
       font-size: 1.4em;
       line-height: 1.5;
+    }
+    .target {
+      font-size: 1.2em;
+      color: #3498db;
+      margin: 10px 0;
     }
     .btn {
       padding: 12px 24px;
@@ -41,13 +43,23 @@
       border-radius: 30px;
       margin: 8px;
     }
-    .penalty-btn {
+    .choice-btn {
       background: #3498db;
     }
-    .admin-link {
-      position: fixed; left: 20px; bottom: 20px; color: #333; font-size: 24px; opacity: 0.1; z-index: 1000;
+    .target-select {
+      margin: 20px 0;
+      font-size: 1.2em;
     }
-    .admin-link:hover, .admin-link:active { opacity: 1; color: #e74c3c; }
+    select {
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 5px;
+      background: #333;
+      color: white;
+      width: 70%;
+      margin: 10px 0;
+    }
+    option { color: #fff; background: #333; }
   </style>
 </head>
 <body>
@@ -58,12 +70,31 @@
       <div class="background"></div>
     {% endif %}
     <div class="text">{{ card.text }}</div>
+
+    <!-- Если выбрана цель -->
+    {% if selected_target %}
+      <div class="target">👉 <strong>{{ selected_target }}</strong></div>
+    {% elif card.target == 'Партнёр на выбор' and not selected_target %}
+      <div class="target-select">
+        <p><strong>Кому задание?</strong></p>
+        <form method="POST" action="/select-target">
+          <select name="target_player" required>
+            {% for p in targetable_players %}
+              <option value="{{ p.name }}">{{ p.name }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn">Выбрать</button>
+        </form>
+      </div>
+    {% endif %}
   </div>
 
-  <p><strong>Следующий:</strong> {{ next.name }}</p>
-
-  <a href="/next" class="btn">Выполнено →</a>
-  <a href="/penalty" class="btn penalty-btn">Не выполнено →</a>
+  <!-- Кнопки только если цель выбрана или не нужна -->
+  {% if card.target != 'Партнёр на выбор' or selected_target %}
+    <p><strong>Следующий:</strong> {{ next.name }}</p>
+    <a href="/next" class="btn">Выполнено →</a>
+    <a href="/penalty" class="btn choice-btn">Не выполнено →</a>
+  {% endif %}
 
   <a href="/admin-secret" class="admin-link">...</a>
 </body>
