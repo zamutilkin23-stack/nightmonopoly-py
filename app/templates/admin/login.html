@@ -1,14 +1,32 @@
-from flask import request, url_for
-
-@main.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    # Откуда пришёл? Сохраним
-    next_page = request.args.get('next') or url_for('main.index')
-
-    if request.method == 'POST':
-        if request.form['username'] == 'Vladimirovich' and request.form['password'] == 'Timur':
-            session['admin_logged_in'] = True
-            return redirect(next_page)
-        flash('Неверный логин или пароль', 'error')
-    
-    return render_template('admin/login.html', next=next_page)
+<!-- templates/admin/login.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Вход в админку</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; text-align: center; padding: 60px; background: #2c3e50; color: #fff; }
+    .form { background: #34495e; padding: 30px; border-radius: 10px; max-width: 350px; margin: 0 auto; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 5px; }
+    button { background: #e74c3c; color: white; padding: 12px 20px; border: none; border-radius: 30px; cursor: pointer; }
+    .error { color: #e74c3c; margin: 10px 0; }
+    .back { color: #95a5a6; text-decoration: none; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="form">
+    <h2>🔐 Админка</h2>
+    {% with messages = get_flashed_messages(category_filter=["error"]) %}
+      {% if messages %}
+        <div class="error">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST">
+      <input type="text" name="username" placeholder="Логин" required />
+      <input type="password" name="password" placeholder="Пароль" required />
+      <button type="submit">Войти</button>
+    </form>
+    <a href="/" class="back">← На сайт</a>
+  </div>
+</body>
+</html>
