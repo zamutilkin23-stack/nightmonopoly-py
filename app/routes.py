@@ -108,14 +108,11 @@ def game():
 
     session['current_card_id'] = card.id
 
-    # Автоматический выбор цели, если требуется
+    # Автоматический выбор цели
     selected_target = None
     if card.target == 'Партнёр на выбор':
-        # Все игроки, кроме текущего
         candidates = [p for p in players if p['name'] != player['name']]
-
         if candidates:
-            # Фильтр по ориентации, если нужно
             filtered = []
             for p in candidates:
                 if player['orientation'] == 'Гетеро':
@@ -131,11 +128,8 @@ def game():
                 chosen = random.choice(filtered)
                 selected_target = chosen['name']
             else:
-                # Если нет подходящих — хотя бы случайный (кроме себя)
                 chosen = random.choice(candidates)
                 selected_target = chosen['name']
-        else:
-            selected_target = None  # но вряд ли
 
         session['selected_target'] = selected_target
 
@@ -180,6 +174,118 @@ def penalty():
     return render_template('penalty.html', card=card, player=player, next=next_player)
 
 
-# Остальное — без изменений: admin, login, edit, delete...
-# (остаётся как в предыдущем ответе — не менялось)
-# Только удаляем /select-target — он больше не нужен
+@main.route('/admin-secret')
+def admin_secret():
+    return redirect(url_for('main.admin_login', next=url_for('main.admin')))
+
+
+@main.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    next_page = request.args.get('next') or url_for('main.index')
+    
+    # 🔐 Флаг: если уже вошёл — не пускаем снова
+    if session.get('admin_logged_in'):
+        return redirect(url_for('main.admin'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        # 🔑 Логин/пароль
+        if username == 'Vladimirovich' and password == 'Timur':
+            session['admin_logged_in'] = True
+            session.permanent = True  # ← Чтобы сессия не терялась
+            flash('✅ Добро пожаловать!', 'success')
+            return redirect(next_page)
+        else:
+            flash('❌ Неверный логин или пароль', 'error')
+    
+    return render_template('admin/login.html', next=next_page)
+
+
+@main.route('/admin')
+def admin():
+    if not session.get('admin_logged_in'):
+        flash('🔐 Войдите в админку', 'error')
+        return redirect(url_for('main.admin_login'))
+    game_cards = Card.query.filter_by(card_type='game').all()
+    penalty_cards = Card.query.filter_by(card_type='penalty').all()
+    return render_template('admin/index.html', game_cards=game_cards, penalty_cards=penalty_cards)
+
+
+@main.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    flash('Вы вышли из админки', 'info')
+    return redirect(url_for('main.index'))
+
+
+@main.route('/admin/add-card', methods=['POST'])
+def add_card():
+    if not session.get('admin_logged_in'):
+        flash('❌ Доступ запрещён', 'error')
+        return redirect(url_for('main.admin_login'))
+    
+    try:
+        card = Card(
+            text=request.form['text'].strip(),
+            level=int(request.form['level']),
+            card_type=request.form['card_type'],
+            orientation=request.form['orientation'],
+            gender=request.form['gender'],
+            target=request.form['target'],
+            image_url=request.form.get('image_url'),
+            can_repeat='can_repeat' in request.form
+        )
+        db.session.add(card)
+        db.session.commit()
+        flash('✅ Карточка добавлена', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Ошибка: {str(e)}', 'error')
+    return redirect(url_for('main.admin'))
+
+
+@main.route('/admin/edit-card/<int:id>', methods=['GET', 'POST'])
+def edit_card(id):
+    if not session.get('admin_logged_in'):
+        flash('❌ Доступ запрещён', 'error')
+        return redirect(url_for('main.admin_login'))
+    
+    card = Card.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        try:
+            card.text = request.form['text'].strip()
+            card.level = int(request.form['level'])
+            card.card_type = request.form['card_type']
+            card.orientation = request.form['orientation']
+            card.gender = request.form['gender']
+            card.target = request.form['target']
+            card.image_url = request.form.get('image_url')
+            card.can_repeat = 'can_repeat' in request.form
+            db.session.commit()
+            flash('✅ Обновлено', 'success')
+            return redirect(url_for('main.admin'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'❌ Ошибка: {str(e)}', 'error')
+    
+    return render_template('admin/edit_card.html', card=card)
+
+
+@main.route('/admin/delete-card/<int:id>', methods=['POST'])
+def delete_card(id):
+    if not session.get('admin_logged_in'):
+        flash('❌ Доступ запрещён', 'error')
+        return redirect(url_for('main.admin_login'))
+    
+    try:
+        card = Card.query.get_or_404(id)
+        db.session.delete(card)
+        db.session.commit()
+        flash('🗑️ Удалено', 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Ошибка: {str(e)}', 'error')
+    return redirect(url_for('main.admin'))
