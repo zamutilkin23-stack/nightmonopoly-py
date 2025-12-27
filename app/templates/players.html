@@ -1,0 +1,60 @@
+<!-- templates/players.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Игроки</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: 'Arial'; padding: 40px; background: #000; color: #fff; }
+    .form { max-width: 600px; margin: 0 auto; }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #555; }
+    button { background: #e74c3c; color: white; padding: 12px 24px; border: none; border-radius: 30px; }
+    .player { margin: 20px 0; padding: 15px; background: #1a1a1a; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="form">
+    <h2>👥 Введите игроков</h2>
+    <form method="POST">
+      <label>Количество игроков:</label>
+      <select name="count" required onchange="updatePlayers(this.value)">
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+
+      <div id="players"></div>
+
+      <button type="submit">Начать игру</button>
+    </form>
+  </div>
+
+  <script>
+    function updatePlayers(n) {
+      const container = document.getElementById('players');
+      container.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        container.innerHTML += `
+          <div class="player">
+            <h3>Игрок ${i+1}</h3>
+            <input type="text" name="name_${i}" placeholder="Имя" required />
+            <select name="gender_${i}" required>
+              <option value="Парень">Парень</option>
+              <option value="Девушка">Девушка</option>
+              <option value="Любой">Любой</option>
+            </select>
+            <select name="orientation_${i}" required>
+              <option value="М-Ж">М-Ж</option>
+              <option value="Ж-М">Ж-М</option>
+              <option value="М-М">М-М</option>
+              <option value="Ж-Ж">Ж-Ж</option>
+              <option value="Любая">Любая</option>
+            </select>
+          </div>
+        `;
+      }
+    }
+    updatePlayers(2); // По умолчанию
+  </script>
+</body>
+</html>
