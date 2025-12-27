@@ -1,0 +1,25 @@
+<!-- templates/card.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Карточка</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; text-align: center; padding: 40px; }
+    .card { border: 2px solid #000; padding: 20px; max-width: 400px; margin: 20px auto; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  {% if error %}
+    <div class="error"><h2>{{ error }}</h2></div>
+  {% else %}
+    <div class="card">
+      <h2>Уровень {{ card.level }}</h2>
+      <p>{{ card.text }}</p>
+      <p><small>{{ card.orientation }} | {{ card.gender_combo }} | {{ card.target }}</small></p>
+    </div>
+  {% endif %}
+  <a href="/">← Назад</a>
+</body>
+</html>

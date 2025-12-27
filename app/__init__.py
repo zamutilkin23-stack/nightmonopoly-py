@@ -5,9 +5,9 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-change-in-prod')
+    app.secret_key = os.getenv('SECRET_KEY', 'dev-night-2024')
 
-    # База данных
+    # Подключение к базе
     database_url = os.getenv('DATABASE_URL', 'sqlite:///night.db')
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
@@ -16,7 +16,7 @@ def create_app():
 
     db.init_app(app)
 
-    # Регистрация blueprint
+    # Регистрация маршрутов
     from .routes import main
     app.register_blueprint(main)
 
