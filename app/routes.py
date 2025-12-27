@@ -1,4 +1,4 @@
-# app/routes.py
+        # app/routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from .extensions import db
 from .models import Card
@@ -17,35 +17,36 @@ def index():
 @main.route('/players', methods=['GET', 'POST'])
 def players():
     if request.method == 'POST':
-        try:
-            player_data = request.form.getlist('player')
-            players = []
-            for p in player_data:
-                if p.strip():
-                    name, gender, orientation = p.split('|')
-                    players.append({
-                        'name': name,
-                        'gender': gender,
-                        'orientation': orientation
-                    })
-            if len(players) < 2:
-                flash('Нужно минимум 2 игрока', 'error')
-                return render_template('players.html')
-            session['players'] = players
-            session['current'] = 0
-            return redirect(url_for('main.game'))
-        except Exception as e:
-            flash('Ошибка в данных игроков', 'error')
+        players = []
+
+        for i in range(1, 5):
+            name = request.form.get(f'name{i}')
+            if not name:
+                continue
+            gender = request.form.get(f'gender{i}', 'Любой')
+            orientation = request.form.get(f'orientation{i}', 'Любая')
+            players.append({
+                'name': name,
+                'gender': gender,
+                'orientation': orientation
+            })
+
+        if len(players) < 2:
+            flash('Минимум 2 игрока', 'error')
             return render_template('players.html')
 
-    return render_template('players.html')
+        session['players'] = players
+        session['current'] = 0
+        return redirect(url_for('main.game'))  # Уходим в игру
+
+    return render_template('players.html')  # GET — просто показ
 
 
 # === Игра: показ карточки ===
 @main.route('/game')
 def game():
     players = session.get('players')
-    if not players:
+    if not players or len(players) < 2:
         return redirect(url_for('main.players'))
 
     current = session['current']
@@ -53,7 +54,7 @@ def game():
     next_idx = (current + 1) % len(players)
     next_player = players[next_idx]
 
-    # Фильтрация карточек по ориентации
+    # Фильтрация по ориентации
     allowed_orientations = ['Любая']
     if current_player['orientation'] == 'Би':
         allowed_orientations += ['Гетеро', 'Лесби', 'Другое']
@@ -80,7 +81,7 @@ def next_player():
     return redirect(url_for('main.game'))
 
 
-# === Тайный вход ===
+# === Тайный вход в админку ===
 @main.route('/admin-secret')
 def admin_secret():
     return redirect(url_for('main.admin_login'))
